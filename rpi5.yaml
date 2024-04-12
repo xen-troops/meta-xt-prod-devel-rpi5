@@ -1,0 +1,340 @@
+desc: "Aos virtual development machine"
+min_ver: "0.15"
+
+variables:
+  # Common build configuration
+
+  YOCTOS_WORK_DIR: "yocto"
+  GENERIC_MACHINE: "generic-armv8-xt"
+
+  DOM0_OS: "linux"
+
+  # Network configuration
+
+  DOMAIN_NAME: "rpi5"
+  DOM0_HOST_NAME: "dom0"
+  DOMD_HOST_NAME: "domd"
+  DHCP_NET: "10.0.1"
+  DOM0_IP: "10.0.1.2"
+  DOMD_IP: "10.0.1.1"
+
+  # Gen4 build configuration
+
+  RPI_MACHINE: "raspberrypi4-64"
+  RPI_SOC_FAMILY: "rpi"
+  ZEPHYR_DOM0_MACHINE: "rpi_4b"
+
+  DOM0_BUILD_DIR: "build/dom0"
+  DOMD_BUILD_DIR: "build/domd"
+  ZEPHYR_DOM0_DIR: "zephyr"
+
+  XT_DOMD_DTB_NAME: "%{RPI_SOC_FAMILY}-%{RPI_MACHINE}-domd.dtb"
+  XT_XEN_DTB_NAME: "%{RPI_SOC_FAMILY}-%{RPI_MACHINE}-xen.dtb"
+  XT_DOMD_CONFIG_NAME: "domd.cfg"
+
+  XT_DOMU_CONFIG_NAME: "domu.cfg"
+
+  XT_KERNEL_BRANCH: "rpi-6.6.y"
+  XT_KERNEL_REV: "${AUTOREV}"
+
+  XT_DOMD_IMAGE: "rpi-image-minimal"
+  ZEPHYR_DOM0_TARGET: "zephyr/samples/hello_world"
+
+common_data:
+  # Sources used by all domains
+  common_sources: &COMMON_SOURCES
+    - type: git
+      url: "git://git.yoctoproject.org/poky"
+      rev: "scarthgap"
+    - type: git
+      url: "git://git.openembedded.org/meta-openembedded"
+      rev: "scarthgap"
+    - type: git
+      url: "git://git.yoctoproject.org/meta-virtualization"
+      rev: "master"
+    - type: git
+      url: "git://git.yoctoproject.org/meta-security"
+      rev: "master"
+    - type: git
+      url: "git@github.com:dsemenets/meta-xt-common.git"
+      rev: "scarthgap"
+    - type: git
+      url: "git@github.com:dsemenets/meta-xt-rpi5.git"
+      rev: "init"
+    - type: git
+      url: "git@github.com:dsemenets/meta-xt-rpi5-prod-devel.git"
+      rev: "main"
+
+
+  # Zephyr sources
+  zephyr_sources: &ZEPHYR_SOURCES
+    - type: west
+      url: "https://github.com/xen-troops/zephyr.git"
+      rev: "zephyr-v3.6.0"
+
+  # Sources to be used in DomD
+  domd_sources: &DOMD_SOURCES
+    - type: git
+      url: "git://git.yoctoproject.org/meta-selinux"
+      rev: "master"
+
+  # Common configuration options for all yocto-based domains
+  common_conf: &COMMON_CONF
+    - [SSTATE_DIR, "${TOPDIR}/../../../../../common_data/sstate"]
+    - [DL_DIR, "${TOPDIR}/../../../../../common_data/downloads"]
+
+    # Skip warning about missing "virtualization" distro feature
+    - [SKIP_META_VIRT_SANITY_CHECK, "1"]
+
+    # Use hypervisor console on all guests
+    - [SERIAL_CONSOLES, "115200;hvc0"]
+
+    # Init manager
+    - [INIT_MANAGER, "systemd"]
+
+    # Do not install kernel image to rootfs to decrease initrd size
+    - ["RDEPENDS_${KERNEL_PACKAGE_NAME}-base", ""]
+
+    # Remove features that we are not using
+    - [
+        DISTRO_FEATURES:remove,
+        "x11 gtk gobject-introspection-data wifi nfc
+        bluetooth irda zeroconf 3g sysvinit acl alsa argp pcmcia usbgadget
+        usbhost opengl ptest multiarch wayland vulkan sysvinit",
+      ]
+
+  # Common configuration options for all dom0
+  dom0_conf: &DOM0_CONF
+
+    # Disable HWDB which quite huge (around 15MB) and is not required at all
+    - [BAD_RECOMMENDATIONS:append, " udev-hwdb"]
+
+  # Common configuration options for all domx
+  domx_conf: &DOMX_CONF
+
+    # add the static lib to SDK toolchain
+    - [SDKIMAGE_FEATURES:append, " staticdev-pkgs"]
+
+    # Remove ptest to reduce the build time
+    - [DISTRO_FEATURES:remove, "ptest"]
+
+    # Add Capacity Aware migration Strategy (CAS)
+    - [MACHINE_FEATURES:append, " cas"]
+
+    # Enable seccomp for crun
+    - [DISTRO_FEATURES:append, " seccomp"]
+
+    # Initramfs configuration
+#    - [INITRAMFS_IMAGE, "image-initramfs"]
+#    - [INITRAMFS_IMAGE_BUNDLE, "0"]
+#    - [INITRAMFS_FSTYPES, "cpio.gz"]
+
+    # Generate ext4 image files
+    - [IMAGE_FSTYPES:append, " ext4"]
+
+    # Enable security features
+    - [DISTRO_FEATURES:append, " security"]
+components:
+  domd:
+    build-dir: "%{YOCTOS_WORK_DIR}"
+    sources:
+      - *COMMON_SOURCES
+      - *DOMD_SOURCES
+      - type: git
+        url: https://git.yoctoproject.org/meta-raspberrypi
+        rev: "master"
+
+    builder:
+      type: yocto
+      work_dir: "%{DOMD_BUILD_DIR}"
+      conf:
+        - *COMMON_CONF
+        - *DOMX_CONF
+        - [MACHINE, "%{RPI_MACHINE}"]
+        - [SOC_FAMILY, "%{RPI_SOC_FAMILY}"]
+        - [XT_DOM_NAME, "domd"]
+        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME}"]
+        - [XT_KERNEL_BRANCH, "%{XT_KERNEL_BRANCH}"]
+        - [XT_KERNEL_REV, "%{XT_KERNEL_REV}"]
+        - [DOM0_OS, "%{DOM0_OS}"]
+        - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
+        - [XT_DOMU_CONFIG_NAME, "%{XT_DOMU_CONFIG_NAME}"]
+        - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
+        - [PREFERRED_VERSION_xen,"4.18+stable"]
+        - [PREFERRED_VERSION_xen-tools, "4.18+stable"]
+
+        # Network configuration
+        - [DOMAIN_NAME, "%{DOMAIN_NAME}"]
+        - [HOST_NAME, "%{DOMD_HOST_NAME}"]
+        - [DOM0_HOST_NAME, "%{DOM0_HOST_NAME}"]
+        - [DHCP_NET, "%{DHCP_NET}"]
+        - [DOM0_IP, "%{DOM0_IP}"]
+        - [DOMD_IP, "%{DOMD_IP}"]
+
+        # RPI specific
+        - [ENABLE_UART, "1"]
+        - [RPI_USE_U_BOOT, "1"]
+        - [PREFERRED_PROVIDER_u-boot-default-script, "xt-rpi-u-boot-scr"]
+        - [UART_BOORLOADER, "1"]
+
+      build_target: "%{XT_DOMD_IMAGE}"
+      layers:
+        - "../../poky/meta"
+        - "../../poky/meta-poky"
+        - "../../poky/meta-yocto-bsp"
+        - "../../meta-virtualization"
+        - "../../meta-raspberrypi"
+        - "../../meta-openembedded/meta-oe"
+        - "../../meta-openembedded/meta-networking"
+        - "../../meta-openembedded/meta-perl"
+        - "../../meta-openembedded/meta-python"
+        - "../../meta-openembedded/meta-filesystems"
+        - "../../meta-selinux"
+        - "../../meta-security"
+        - "../../meta-xt-common/meta-xt-domx"
+        - "../../meta-xt-common/meta-xt-driver-domain"
+        - "../../meta-xt-rpi5/meta-rpi-domd"
+
+        #- "../../meta-xt-rpi5-prod-devel/meta-xt-prod-devel-rpi-control"
+
+      target_images:
+        - "tmp/deploy/images/%{RPI_MACHINE}/xen-%{RPI_MACHINE}"
+        - "tmp/deploy/images/%{RPI_MACHINE}/xenpolicy-%{RPI_MACHINE}"
+        - "tmp/deploy/images/%{RPI_MACHINE}/%{XT_XEN_DTB_NAME}"
+        - "tmp/deploy/images/%{RPI_MACHINE}/rpi-image-minimal-%{RPI_MACHINE}.ext4"
+        - "tmp/deploy/images/%{RPI_MACHINE}/rpi-image-minimal-%{RPI_MACHINE}.tar.bz2"
+        - "tmp/deploy/images/%{RPI_MACHINE}/Image-%{RPI_MACHINE}.bin"
+
+
+images:
+  full:
+    type: gpt
+    desc: "Full RPI image"
+    sector_size: 512
+    partitions:
+      boot:
+        gpt_type: 21686148-6449-6E6F-744E-656564454649 # BIOS boot partition (kinda...)
+        type: vfat
+        size: 64 MiB
+        items:
+          "bootcode.bin": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/bootcode.bin"
+          "config.txt": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/config.txt"
+          "cmdline.txt": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/cmdline.txt"
+          "fixup.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup.dat"
+          "fixup_cd.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup_cd.dat"
+          "fixup_db.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup_db.dat"
+          "fixup_x.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup_x.dat"
+          "fixup4.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup4.dat"
+          "fixup4cd.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup4cd.dat"
+          "fixup4db.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup4db.dat"
+          "fixup4x.dat": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/fixup4x.dat"
+          "start.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start.elf"
+          "start_cd.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start_cd.elf"
+          "start_db.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start_db.elf"
+          "start_x.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start_x.elf"
+          "start4.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start4.elf"
+          "start4db.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start4db.elf"
+          "start4cd.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start4cd.elf"
+          "start4x.elf": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/bootfiles/start4x.elf"
+          "xen": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/xen-%{RPI_MACHINE}"
+          "kernel8.img": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/u-boot-%{RPI_MACHINE}.bin"
+          "boot.scr": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/boot.scr"
+          "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/build/zephyr/zephyr.bin"
+
+      rootfs:
+        gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
+        type: raw_image
+        image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/%{XT_DOMD_IMAGE}-%{RPI_MACHINE}.rootfs.ext4"
+
+parameters:
+  DOM0:
+    desc: "Select Dom0"
+    linux:
+      overrides:
+        components:
+          dom0:
+            default: true
+            build-dir: "%{YOCTOS_WORK_DIR}"
+            sources:
+              - *COMMON_SOURCES
+
+            builder:
+              type: yocto
+              work_dir: "%{DOM0_BUILD_DIR}"
+              conf:
+                - *COMMON_CONF
+                - *DOM0_CONF
+                - [MACHINE, "%{GENERIC_MACHINE}"]
+                - [XT_DOM_NAME, "dom0"]
+                - [XT_GUEST_INSTALL, "domd"]
+                - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
+                - [XT_DOMD_MACHINE, "%{RPI_MACHINE}"]
+                - [XT_DOMD_IMAGE, "%{XT_DOMD_IMAGE}"]
+                - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
+                - [XT_DOMU_CONFIG_NAME, "%{XT_DOMU_CONFIG_NAME}"]
+
+                # Network configuration
+                - [DOMAIN_NAME, "%{DOMAIN_NAME}"]
+                - [HOST_NAME, "%{DOM0_HOST_NAME}"]
+                - [DOM0_MAC, "08:00:27:ff:cf:cb"]
+
+                # RPI specific
+                - [ENABLE_UART, "1"]
+                - [RPI_USE_U_BOOT, "1"]
+
+              layers:
+                - "../../meta-virtualization"
+                - "../../meta-openembedded/meta-oe"
+                - "../../meta-openembedded/meta-filesystems"
+                - "../../meta-openembedded/meta-python"
+                - "../../meta-openembedded/meta-networking"
+                - "../../meta-xt-common/meta-xt-control-domain"
+                - "../../meta-xt-common/meta-xt-domx"
+                - "../../meta-xt-common/meta-xt-dom0"
+                - "../../meta-raspberrypi"
+                - "../../meta-xt-rpi5/meta-rpi-dom0"
+                - "../../meta-xt-rpi5-prod-devel/meta-xt-prod-devel-rpi-control"
+                - "../../meta-xt-common/meta-xt-control-domain"
+
+              build_target: core-image-thin-initramfs
+              external_src:
+                domd: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/"
+ 
+              additional_deps:
+                - "%{DOMD_BUILD_DIR}/tmp/deploy/images/%{RPI_MACHINE}/Image-%{RPI_MACHINE}.bin"
+
+              target_images:
+                - "tmp/deploy/images/%{GENERIC_MACHINE}/Image"
+                - "tmp/deploy/images/%{GENERIC_MACHINE}/uInitramfs"
+
+    zephyr:
+      default: true
+      overrides:
+        variables:
+          DOM0_OS: "zephyr"
+          DOMD_IP: "10.0.0.1"
+
+        components:
+          dom0:
+            build-dir: "%{ZEPHYR_DOM0_DIR}"
+            sources:
+              - *ZEPHYR_SOURCES
+
+            builder:
+              type: zephyr
+              board: "%{ZEPHYR_DOM0_MACHINE}"
+              target: "%{ZEPHYR_DOM0_TARGET}"
+              work_dir: build
+              snippets:
+                - "xen_dom0"
+              target_images:
+                - "build/zephyr/zephyr.bin"
+
+          domd:
+            default: true
+            builder:
+              additional_deps:
+                - "../%{ZEPHYR_DOM0_DIR}/build/zephyr/zephyr.bin"
+              external_src:
+                dom0: "%{ZEPHYR_DOM0_DIR}/build/zephyr/zephyr.bin"
+

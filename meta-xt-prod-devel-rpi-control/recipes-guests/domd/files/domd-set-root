@@ -1,0 +1,51 @@
+#!/bin/sh
+# Change domain configuration to boot from storage configured by u-boot
+
+DOMD_CFG_FILE="/etc/xen/domd.cfg"
+
+# detect boot storage device
+BOOT_STORAGE=`cat /proc/device-tree/boot_dev/device`
+if [ -z "$BOOT_STORAGE" ] ; then
+    BOOT_STORAGE=mmcblk1
+    echo "WARNING! Using default storage: ${BOOT_STORAGE}"
+fi
+
+# Special case for NFS - we want to quite different cmd line
+if [ $BOOT_STORAGE = nfs ] ; then
+    MY_IP=`cat /proc/device-tree/boot_dev/my_ip | tr -d '\000'`
+    if [ -z "$MY_IP" ] ; then
+        MY_IP="dhcp"
+        echo "WARNING! Using default ip address ${MY_IP}"
+    fi
+
+    SERVER_IP=`cat /proc/device-tree/boot_dev/nfs_server_ip  | tr -d '\000'`
+    if [ -z "$SERVER_IP" ] ; then
+        SERVER_IP="192.168.1.100"
+        echo "WARNING! Using default server ip address ${SERVER_IP}"
+    fi
+
+    NFS_DIR=`cat /proc/device-tree/boot_dev/nfs_dir | tr -d '\000'`
+    if [ -z "$NFS_DIR" ] ; then
+        NFS_DIR="/srv/domd"
+        echo "WARNING! Using default NFS directory ${NFS_DIR}"
+    fi
+
+    BOOT_STR="nfs nfsroot=${SERVER_IP}:${NFS_DIR},vers=3 ip=${MY_IP}"
+    # Escape slahes ( / ->\/ )
+    BOOT_STR=`echo "${BOOT_STR}" | sed "s/\//\\\\\\\\\//g"`
+
+    echo "Mangling domain configuration: setting storage to network boot"
+    sed -i "s/STORAGE_PART[0-9]/${BOOT_STR}/g" $DOMD_CFG_FILE
+    exit 0
+fi
+
+# guess partition prefix, e.g. "" for sda2 or "p" for mmcblk1p2
+PART_PREFIX=""
+if echo "${BOOT_STORAGE}" | grep -q 'mmc' ; then
+   PART_PREFIX="p"
+fi
+STORAGE_PART="${BOOT_STORAGE}${PART_PREFIX}"
+
+# now make up the configuration
+echo "Mangling domain configuration: setting storage to ${BOOT_STORAGE}"
+sed -i "s/STORAGE_PART/${STORAGE_PART}/g" $DOMD_CFG_FILE

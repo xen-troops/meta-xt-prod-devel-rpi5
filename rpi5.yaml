@@ -12,7 +12,7 @@ variables:
 
   ZEPHYR_DOM0_DIR: "zephyr"
   ZEPHYR_DOM0_MACHINE: "rpi_5"
-  ZEPHYR_DOM0_TARGET: "zephyr/samples/hello_world"
+  ZEPHYR_DOM0_TARGET: "zephyr-dom0-xt"
   ZEPHYR_DOM0_BUILD_DIR: "build-dom0"
 
   DOMD_BUILD_DIR: "build-domd"
@@ -27,8 +27,8 @@ components:
     build-dir: "%{ZEPHYR_DOM0_DIR}"
     sources:
       - type: west
-        url: "https://github.com/xen-troops/zephyr.git"
-        rev: "rpi5_dev"
+        url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
+        rev: "rpi5_dom0_dev"
 
     builder:
       type: zephyr

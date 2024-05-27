@@ -115,6 +115,7 @@ components:
         - "../meta-openembedded/meta-python"
         - "../meta-openembedded/meta-filesystems"
         - "../meta-xt-common/meta-xt-domx"
+        - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
 
       target_images:
@@ -126,6 +127,7 @@ components:
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
         - "tmp/deploy/images/%{MACHINE}/Image.gz-%{MACHINE}.bin"
         - "tmp/deploy/images/%{MACHINE}/Image-%{MACHINE}.bin"
+        - "tmp/deploy/images/%{MACHINE}/armstub8-2712.bin"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/bootcode.bin"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/config.txt"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/cmdline.txt"
@@ -157,6 +159,7 @@ images:
         type: vfat
         size: 512 MiB
         items:
+          "armstub8-2712.bin": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/armstub8-2712.bin"
           "bootcode.bin": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bootfiles/bootcode.bin"
           "config.txt":   "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bootfiles/config.txt"
           "cmdline.txt":  "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bootfiles/cmdline.txt"

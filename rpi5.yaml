@@ -56,10 +56,10 @@ components:
         rev: "scarthgap"
       - type: git
         url: "https://git.yoctoproject.org/meta-selinux"
-        rev: "master"
+        rev: "scarthgap"
       - type: git
         url: "https://git.yoctoproject.org/meta-raspberrypi"
-        rev: "master"
+        rev: "scarthgap"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-common.git"
         rev: "master"

@@ -16,7 +16,7 @@ variables:
   ZEPHYR_DOM0_BUILD_DIR: "build-dom0"
 
   DOMD_BUILD_DIR: "build-domd"
-  XT_XEN_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtb"
+  XT_XEN_DTBO_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtbo"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
 
   XT_DOMD_IMAGE: "rpi5-image-xt-domd"
@@ -90,7 +90,7 @@ components:
         - [MACHINE, "%{MACHINE}"]
         - [RPI_SOC_FAMILY, "%{SOC_FAMILY}"]
         - [XT_DOM_NAME, "domd"]
-        - [XT_DEVICE_TREES, "%{XT_XEN_DTB_NAME}"]
+        - [XT_DEVICE_TREES, "%{XT_XEN_DTBO_NAME}"]
         - [DOM0_OS, "%{DOM0_OS}"]
         - [PREFERRED_VERSION_xen,"4.19.0+git"]
         - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
@@ -120,7 +120,7 @@ components:
       target_images:
         - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"
         - "tmp/deploy/images/%{MACHINE}/xenpolicy-%{MACHINE}"
-        - "tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTB_NAME}"
+        - "tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTBO_NAME}"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_DTB_NAME}"
         - "tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
@@ -181,7 +181,7 @@ images:
           "xenpolicy": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/xenpolicy-%{MACHINE}"
           "u-boot": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/u-boot-%{MACHINE}.bin"
           "boot.scr": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/boot.scr"
-          "%{XT_XEN_DTB_NAME}": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTB_NAME}"
+          "%{XT_XEN_DTBO_NAME}": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTBO_NAME}"
           "%{XT_DOMD_DTB_NAME}": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_DTB_NAME}"
           "bcm2712-rpi-5-b.dtb": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"

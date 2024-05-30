@@ -117,6 +117,7 @@ components:
         - "../meta-xt-common/meta-xt-domx"
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
+        - "../meta-xt-rpi5-prod-devel"
 
       target_images:
         - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"

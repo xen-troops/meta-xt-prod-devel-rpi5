@@ -125,6 +125,10 @@ components:
         - "tmp/deploy/images/%{MACHINE}/xenpolicy-%{MACHINE}"
         - "tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTBO_NAME}"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_DTB_NAME}"
+        - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/mmc-passthrough.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
         - "tmp/deploy/images/%{MACHINE}/Image.gz-%{MACHINE}.bin"
@@ -189,12 +193,11 @@ images:
           "%{XT_XEN_DTBO_NAME}": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTBO_NAME}"
           "%{XT_DOMD_DTB_NAME}": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_DTB_NAME}"
           "bcm2712-rpi-5-b.dtb": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
+          "mmc-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/mmc-passthrough.dtbo"
+          "usb-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
+          "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
+          "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
-      rootfs:
-        gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
-        type: raw_image
-        size: 8 GiB
-        image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
 
 parameters:
   # Machines
@@ -228,3 +231,44 @@ parameters:
                 gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
                 type: vfat
                 size: 128 MiB
+
+  DOMD_ROOT:
+    desc: "Domd root device"
+    mmc:
+      default: true
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"]
+                - [MACHINE_FEATURES:append, " domd_mmc"]
+        images:
+          full:
+            partitions:
+              rootfs:
+                gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
+                type: raw_image
+                size: 8 GiB
+                image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
+
+    usb:
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"]
+                - [MACHINE_FEATURES:append, " domd_usb"]
+                - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=\\\\/dev\\\\/sda1 rootfstype=ext4 rootwait"]
+        images:
+          rootfs:
+            type: gpt
+            desc: "Full RPI image"
+            sector_size: 512
+            partitions:
+              rootfs:
+                gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
+                type: raw_image
+                size: 8 GiB
+                image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"

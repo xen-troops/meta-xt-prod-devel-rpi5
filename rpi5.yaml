@@ -156,7 +156,7 @@ images:
     sector_size: 512
     partitions:
       boot:
-        gpt_type: C12A7328-F81F-11D2-BA4B-00A0C93EC93B # EFI System partition
+        gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
         type: vfat
         size: 512 MiB
         items:

@@ -206,3 +206,24 @@ parameters:
           MACHINE: "raspberrypi5"
           SOC_FAMILY: "bcm2712"
           ZEPHYR_DOM0_DIR: "zephyr"
+
+  ENABLE_DOM0_PART:
+    desc: "Enable partition for dom0"
+    no:
+      default: true
+      overrides:
+        variables:
+          USE_DOM0_PARTITION: "0"
+          PART_SRC: ""
+    yes:
+      overrides:
+        variables:
+          USE_DOM0_PARTITION: "1"
+          PART_SRC: "ext_src"
+        images:
+          full:
+            partitions:
+              dom0:
+                gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
+                type: vfat
+                size: 128 MiB

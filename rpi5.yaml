@@ -94,6 +94,7 @@ components:
       type: custom_script
       script: "../%{YOCTOS_WORK_DIR}/meta-xt-rpi5-prod-devel/get_bins.sh"
       target_images:
+        - "helloworld_xen-arm64"
         - "zephyr_blinky.dtb"
         - "zephyr_sync.dtb"
       additional_deps:
@@ -250,6 +251,7 @@ images:
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.dtb": "domu_bins/zephyr_blinky.dtb"
           "dom0/z_sync.dtb": "domu_bins/zephyr_sync.dtb"
+          "dom0/helloworld_xen-arm64": "domu_bins/helloworld_xen-arm64"
       dom0:
         gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
         type: vfat
@@ -259,6 +261,7 @@ images:
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.dtb": "domu_bins/zephyr_blinky.dtb"
           "dom0/z_sync.dtb": "domu_bins/zephyr_sync.dtb"
+          "dom0/helloworld_xen-arm64": "domu_bins/helloworld_xen-arm64"
       rootfs:
         gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
         type: raw_image

@@ -115,6 +115,7 @@ components:
         - "../meta-openembedded/meta-python"
         - "../meta-openembedded/meta-filesystems"
         - "../meta-xt-common/meta-xt-domx"
+        - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
         - "../meta-xt-rpi5-prod-devel"

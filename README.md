@@ -30,6 +30,12 @@ or
 ninja full.img.gz
 ```
 
+In case of use domd rootfs from the usb flash drive rootfs partition will not be created in image. Rootfs
+image should be written separately to the appropriate partition on media with command:
+```
+dd if=yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 of=<partition device> bs=1M
+```
+Note: before writing rootfs media should be properly partitioned for example with `fdisk` command
 ## Known issues
 1. Sometime rpi boot firmware files are not deployed during build. In this case rpi-bootfiles, rpi-config and
 rpi-cmdline recipes should be cleaned with yocto command:

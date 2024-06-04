@@ -82,6 +82,16 @@ components:
       target_images:
         - "%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
 
+  domu_unikraft:
+    default: true
+    build-dir: domu_unikraft
+
+    builder:
+      type: custom_script
+      script: "../%{YOCTOS_WORK_DIR}/meta-xt-rpi5-prod-devel/get_unikraft.sh"
+      target_images:
+        - "helloworld_xen-arm64"
+
   domd:
     build-dir: "%{YOCTOS_WORK_DIR}"
     sources:
@@ -239,6 +249,7 @@ images:
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
+          "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
 
 parameters:
   # Machines
@@ -275,6 +286,7 @@ parameters:
                 items:
                   "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
                   "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
+                  "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
 
   DOMD_ROOT:
     desc: "Domd root device"

@@ -15,6 +15,12 @@ variables:
   ZEPHYR_DOM0_TARGET: "zephyr-dom0-xt"
   ZEPHYR_DOM0_BUILD_DIR: "build-dom0"
 
+  ZEPHYR_DOMU1_DIR: "zephyr_sync"
+  ZEPHYR_DOMU1_BUILD_DIR: "build-sync"
+
+  ZEPHYR_DOMU2_DIR: "zephyr_blinky"
+  ZEPHYR_DOMU2_BUILD_DIR: "build-blinky"
+
   DOMD_BUILD_DIR: "build-domd"
   XT_XEN_DTBO_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtbo"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
@@ -41,6 +47,40 @@ components:
         - "%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       additional_deps:
         - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/Image.gz"
+
+  domu_sync:
+    default: true
+    build-dir: "%{ZEPHYR_DOMU1_DIR}"
+    sources:
+      - type: west
+        url: "https://github.com/xen-troops/zephyr.git"
+        rev: "rpi5_dev"
+
+    builder:
+      type: zephyr
+      board: xenvm
+      target: zephyr/samples/synchronization
+      work_dir: "%{ZEPHYR_DOMU1_BUILD_DIR}"
+      target_images:
+        - "%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
+
+  domu_blinky:
+    default: true
+    build-dir: "%{ZEPHYR_DOMU2_DIR}"
+    sources:
+      - type: west
+        url: "https://github.com/xen-troops/zephyr.git"
+        rev: "rpi5_dev"
+
+    builder:
+      type: zephyr
+      board: xenvm
+      target: zephyr/samples/basic/blinky
+      work_dir: "%{ZEPHYR_DOMU2_BUILD_DIR}"
+      snippets:
+        - "rpi_5_xen_domd"
+      target_images:
+        - "%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
 
   domd:
     build-dir: "%{YOCTOS_WORK_DIR}"
@@ -197,6 +237,8 @@ images:
           "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
+          "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
+          "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
 
 parameters:
   # Machines
@@ -230,6 +272,9 @@ parameters:
                 gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
                 type: vfat
                 size: 128 MiB
+                items:
+                  "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
+                  "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
 
   DOMD_ROOT:
     desc: "Domd root device"

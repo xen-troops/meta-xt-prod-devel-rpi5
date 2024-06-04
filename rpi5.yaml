@@ -166,7 +166,7 @@ components:
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
-        - "../meta-xt-rpi5-prod-devel"
+        - "../meta-xt-rpi5-prod-devel/xt-prod-devel-rpi5-domd"
 
       target_images:
         - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"

@@ -250,6 +250,15 @@ images:
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.dtb": "domu_bins/zephyr_blinky.dtb"
           "dom0/z_sync.dtb": "domu_bins/zephyr_sync.dtb"
+      dom0:
+        gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
+        type: vfat
+        size: 512 MiB
+        items:
+          "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
+          "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
+          "dom0/z_blinky.dtb": "domu_bins/zephyr_blinky.dtb"
+          "dom0/z_sync.dtb": "domu_bins/zephyr_sync.dtb"
       rootfs:
         gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
         type: raw_image

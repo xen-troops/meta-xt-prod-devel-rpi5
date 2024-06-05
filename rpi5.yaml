@@ -35,8 +35,6 @@ components:
       board: "%{ZEPHYR_DOM0_MACHINE}"
       target: "%{ZEPHYR_DOM0_TARGET}"
       work_dir: "%{ZEPHYR_DOM0_BUILD_DIR}"
-      snippets:
-        - "xen_dom0"
       target_images:
         - "%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       additional_deps:

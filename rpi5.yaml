@@ -22,10 +22,44 @@ variables:
   ZEPHYR_DOMU2_BUILD_DIR: "build-blinky"
 
   DOMD_BUILD_DIR: "build-domd"
+  DOMU_BUILD_DIR: "build-domu"
   XT_XEN_DTBO_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtbo"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
 
   XT_DOMD_IMAGE: "rpi5-image-xt-domd"
+  XT_DOMU_IMAGE: "core-image-thin-initramfs"
+
+  DOMU_MACHINE: "generic-armv8-xt"
+
+common_data:
+  common_yocto_sources: &COMMON_YOCTO_SOURCES
+    - type: git
+      url: "https://git.yoctoproject.org/poky"
+      rev: "scarthgap"
+    - type: git
+      url: "https://git.openembedded.org/meta-openembedded"
+      rev: "scarthgap"
+    - type: git
+      url: "https://github.com/xen-troops/meta-xt-common.git"
+      rev: "master"
+    - type: git
+      url: "https://git.yoctoproject.org/meta-virtualization"
+      rev: "scarthgap"
+    - type: git
+      url: "https://git.yoctoproject.org/meta-selinux"
+      rev: "scarthgap"
+    - type: git
+      url: "https://github.com/xen-troops/meta-xt-rpi5-prod-devel.git"
+      rev: "main"
+
+  common_yocto_layers: &COMMON_YOCTO_LAYERS
+    - "../meta-openembedded/meta-oe"
+    - "../meta-openembedded/meta-python"
+    - "../meta-openembedded/meta-networking"
+    - "../meta-openembedded/meta-filesystems"
+    - "../meta-xt-common/meta-xt-domx"
+    - "../meta-selinux"
+    - "../meta-virtualization"
 
 components:
   dom0:
@@ -45,6 +79,7 @@ components:
         - "%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       additional_deps:
         - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/Image.gz"
+        - "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
   domu_sync:
     default: true
@@ -93,29 +128,12 @@ components:
   domd:
     build-dir: "%{YOCTOS_WORK_DIR}"
     sources:
-      - type: git
-        url: "https://git.yoctoproject.org/poky"
-        rev: "scarthgap"
-      - type: git
-        url: "https://git.openembedded.org/meta-openembedded"
-        rev: "scarthgap"
-      - type: git
-        url: "https://git.yoctoproject.org/meta-virtualization"
-        rev: "scarthgap"
-      - type: git
-        url: "https://git.yoctoproject.org/meta-selinux"
-        rev: "scarthgap"
+      - *COMMON_YOCTO_SOURCES
       - type: git
         url: "https://git.yoctoproject.org/meta-raspberrypi"
         rev: "scarthgap"
       - type: git
-        url: "https://github.com/xen-troops/meta-xt-common.git"
-        rev: "master"
-      - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "main"
-      - type: git
-        url: "https://github.com/xen-troops/meta-xt-rpi5-prod-devel.git"
         rev: "main"
 
     builder:
@@ -154,15 +172,9 @@ components:
 
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
-        - "../meta-virtualization"
+        - *COMMON_YOCTO_LAYERS
         - "../meta-raspberrypi"
-        - "../meta-selinux"
-        - "../meta-openembedded/meta-oe"
-        - "../meta-openembedded/meta-networking"
         - "../meta-openembedded/meta-perl"
-        - "../meta-openembedded/meta-python"
-        - "../meta-openembedded/meta-filesystems"
-        - "../meta-xt-common/meta-xt-domx"
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
@@ -200,6 +212,42 @@ components:
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4db.elf"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4cd.elf"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4x.elf"
+  domu:
+    build-dir: "%{YOCTOS_WORK_DIR}"
+    sources:
+      - *COMMON_YOCTO_SOURCES
+    builder:
+      type: yocto
+      work_dir: "%{DOMU_BUILD_DIR}"
+      conf:
+        - [SSTATE_DIR, "${TOPDIR}/../../../common_data/sstate"]
+        - [DL_DIR, "${TOPDIR}/../../../common_data/downloads"]
+        # Skip warning about missing "virtualization" distro feature
+        - [SKIP_META_VIRT_SANITY_CHECK, "1"]
+        # Init manager
+        - [INIT_MANAGER, "systemd"]
+        # Do not install kernel image to rootfs to decrease initrd size
+        - ["RDEPENDS_${KERNEL_PACKAGE_NAME}-base", ""]
+        # Remove features that we are not using
+        - [DISTRO_FEATURES:remove,
+            "x11 gtk gobject-introspection-data nfc irda zeroconf 3g sysvinit
+             acl alsa argp pcmcia usbgadget opengl ptest multiarch wayland
+             vulkan sysvinit"]
+        - [MACHINE, "%{DOMU_MACHINE}"]
+        - [XT_DOM_NAME, "domu"]
+        - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
+        # Bundle initramfs into kernel image
+        - [INITRAMFS_IMAGE, "%{XT_DOMU_IMAGE}"]
+        - [INITRAMFS_IMAGE_NAME, "${INITRAMFS_IMAGE}${IMAGE_MACHINE_SUFFIX}.rootfs"]
+        - [INITRAMFS_IMAGE_BUNDLE, "1"]
+      build_target: "%{XT_DOMU_IMAGE}"
+      layers:
+        - *COMMON_YOCTO_LAYERS
+        - "../meta-xt-common/meta-xt-domu"
+        - "../meta-xt-rpi5-prod-devel/xt-prod-devel-rpi5-domu"
+
+      target_images:
+        - "tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
 images:
   full:

@@ -1,5 +1,5 @@
 desc: "Raspberry 5 with xen dom0less"
-min_ver: "0.22"
+min_ver: "0.24"
 
 variables:
   # Common build configuration
@@ -118,12 +118,14 @@ components:
   domu_unikraft:
     default: true
     build-dir: domu_unikraft
+    sources:
+      - type: http
+        url: https://github.com/aoscloud/demo-services/raw/main/monkey_zephyr/src/helloworld_xen-arm64
+        file: helloworld_xen-arm64
+        dir: "."
 
     builder:
-      type: custom_script
-      script: "../%{YOCTOS_WORK_DIR}/meta-xt-rpi5-prod-devel/get_unikraft.sh"
-      target_images:
-        - "helloworld_xen-arm64"
+      type: "null"
 
   domd:
     build-dir: "%{YOCTOS_WORK_DIR}"

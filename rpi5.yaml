@@ -298,7 +298,7 @@ images:
           "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
-          "dom0/liunx_pv_image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
+          "dom0/linux-pv-image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
 parameters:
   # Machines
@@ -336,7 +336,7 @@ parameters:
                   "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
                   "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
                   "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
-                  "dom0/liunx_pv_image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
+                  "dom0/linux-pv-image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
   DOMD_ROOT:
     desc: "Domd root device"

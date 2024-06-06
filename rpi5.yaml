@@ -366,7 +366,7 @@ parameters:
               conf:
                 - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"]
                 - [MACHINE_FEATURES:append, " domd_usb"]
-                - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=\\\\/dev\\\\/sda1 rootfstype=ext4 rootwait"]
+                - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=\\\\/dev\\\\/sda1 rootfstype=ext4 rootwait quiet"]
         images:
           rootfs:
             type: gpt

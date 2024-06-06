@@ -46,3 +46,23 @@ bitbake -c clean rpi-bootfiles -c clean rpi-config -c clean rpi-cmdline
 cd ../..
 ninja
 ```
+2. Same behaviour as in previous section can be observed with the following packages:
+
+In DomD build deployment can be forced using the following commands:
+```
+cd yocto
+. poky/oe-init-build-env build-domd
+bitbake trusted-firmware-a xen linux-raspberrypi xen-tools u-boot -c do_deploy --force
+cd ../..
+ninja
+```
+
+In DomU:
+
+```
+cd yocto
+. poky/oe-init-build-env build-domu
+bitbake linux-generic-armv8 -c do_deploy --force
+cd ../..
+ninja
+```

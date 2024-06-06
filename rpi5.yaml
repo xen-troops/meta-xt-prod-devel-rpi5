@@ -59,7 +59,7 @@ components:
         rev: "scarthgap"
       - type: git
         url: "https://git.yoctoproject.org/meta-raspberrypi"
-        rev: "scarthgap"
+        rev: "1879cb831f4ea3e532cb5ce9fa0f32be917e8fa3"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-common.git"
         rev: "master"

@@ -295,6 +295,11 @@ images:
           "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
+      dom0:
+        gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
+        type: vfat
+        size: 512 MiB
+        items:
           "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
           "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
@@ -311,32 +316,6 @@ parameters:
           MACHINE: "raspberrypi5"
           SOC_FAMILY: "bcm2712"
           ZEPHYR_DOM0_DIR: "zephyr"
-
-  ENABLE_DOM0_PART:
-    desc: "Enable partition for dom0"
-    no:
-      default: true
-      overrides:
-        variables:
-          USE_DOM0_PARTITION: "0"
-          PART_SRC: ""
-    yes:
-      overrides:
-        variables:
-          USE_DOM0_PARTITION: "1"
-          PART_SRC: "ext_src"
-        images:
-          full:
-            partitions:
-              dom0:
-                gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
-                type: vfat
-                size: 128 MiB
-                items:
-                  "dom0/z_sync.bin": "%{ZEPHYR_DOMU1_DIR}/%{ZEPHYR_DOMU1_BUILD_DIR}/zephyr/zephyr.bin"
-                  "dom0/z_blinky.bin": "%{ZEPHYR_DOMU2_DIR}/%{ZEPHYR_DOMU2_BUILD_DIR}/zephyr/zephyr.bin"
-                  "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
-                  "dom0/liunx_pv_image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
   DOMD_ROOT:
     desc: "Domd root device"

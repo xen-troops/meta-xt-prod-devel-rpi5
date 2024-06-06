@@ -341,7 +341,6 @@ parameters:
   DOMD_ROOT:
     desc: "Domd root device"
     mmc:
-      default: true
       overrides:
         components:
           domd:
@@ -359,6 +358,7 @@ parameters:
                 image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
 
     usb:
+      default: true
       overrides:
         components:
           domd:

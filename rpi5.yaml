@@ -49,7 +49,7 @@ common_data:
       url: "https://git.yoctoproject.org/meta-selinux"
       rev: "scarthgap"
     - type: git
-      url: "https://github.com/xen-troops/meta-xt-rpi5-prod-devel.git"
+      url: "https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git"
       rev: "main"
 
   common_yocto_layers: &COMMON_YOCTO_LAYERS
@@ -182,7 +182,7 @@ components:
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
-        - "../meta-xt-rpi5-prod-devel/xt-prod-devel-rpi5-domd"
+        - "../meta-xt-prod-devel-rpi5/xt-prod-devel-rpi5-domd"
 
       target_images:
         - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"
@@ -248,7 +248,7 @@ components:
       layers:
         - *COMMON_YOCTO_LAYERS
         - "../meta-xt-common/meta-xt-domu"
-        - "../meta-xt-rpi5-prod-devel/xt-prod-devel-rpi5-domu"
+        - "../meta-xt-prod-devel-rpi5/xt-prod-devel-rpi5-domu"
 
       target_images:
         - "tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"

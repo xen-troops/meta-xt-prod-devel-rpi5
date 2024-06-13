@@ -377,3 +377,23 @@ parameters:
                 - [MACHINE_FEATURES:append, " scmi"]
     no:
       default: true
+
+  ENABLE_WIFI:
+    desc: "Allow wifi in domd"
+    yes:
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [MACHINE_FEATURES:append, " domd_wifi"]
+                - [LICENSE_FLAGS_ACCEPTED, "synaptics-killswitch"]
+        images:
+          full:
+            partitions:
+              boot:
+                items:
+                  "%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo"
+                  "wifi-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/wifi-passthrough.dtbo"
+    no:
+      default: true

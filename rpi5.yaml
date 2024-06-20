@@ -50,7 +50,7 @@ common_data:
       rev: "07f3233374f013412d691732adfa2c20167a0ea0"
     - type: git
       url: "https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git"
-      rev: "42db8f9e6d3ead1ec991d34c3244431ea7046b40"
+      rev: "b963ceff58543690f79962a20528053a090ab9a4"
 
   common_yocto_layers: &COMMON_YOCTO_LAYERS
     - "../meta-openembedded/meta-oe"
@@ -68,7 +68,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
-        rev: "rpi5-v0.1.0"
+        rev: "rpi5-v0.1.1"
 
     builder:
       type: zephyr
@@ -138,7 +138,7 @@ components:
         rev: "1918a27419dcd5e79954c0dc0edddcde91057a7e"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "576ecac6190c7002ee6e241775df5deb0990a53d"
+        rev: "v0.1.1"
 
     builder:
       type: yocto

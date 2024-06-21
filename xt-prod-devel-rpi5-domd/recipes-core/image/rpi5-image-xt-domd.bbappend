@@ -4,4 +4,5 @@ PACKAGE_INSTALL:append = " \
 
 IMAGE_INSTALL:append = "	\
     optee-test			\
+    xen-tools-vchan		\
 "

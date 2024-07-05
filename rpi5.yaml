@@ -173,6 +173,7 @@ components:
         - [UART_BOORLOADER, "1"]
         - [KERNEL_IMAGETYPE_UBOOT, "Image"]
         - [DISTRO_FEATURES:append, " xen"]
+        - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet"]
 
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
@@ -307,6 +308,17 @@ images:
           "dom0/helloworld_xen-arm64": "domu_unikraft/helloworld_xen-arm64"
           "dom0/linux-pv-image": "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
+  rootfs:
+    type: gpt
+    desc: "Full RPI image"
+    sector_size: 512
+    partitions:
+      rootfs:
+        gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
+        type: raw_image
+        size: 8 GiB
+        image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
+
 parameters:
   # Machines
   MACHINE:
@@ -324,21 +336,11 @@ parameters:
     usb:
       default: true
       overrides:
+        variables:
+          DOMD_ROOTFS_DEV: "\\\\/dev\\\\/sda1"
         components:
           domd:
             builder:
               conf:
                 - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"]
                 - [MACHINE_FEATURES:append, " domd_usb"]
-                - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=\\\\/dev\\\\/sda1 rootfstype=ext4 rootwait quiet"]
-        images:
-          rootfs:
-            type: gpt
-            desc: "Full RPI image"
-            sector_size: 512
-            partitions:
-              rootfs:
-                gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
-                type: raw_image
-                size: 8 GiB
-                image_path: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"

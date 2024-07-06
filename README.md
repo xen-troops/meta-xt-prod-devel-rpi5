@@ -91,6 +91,13 @@ The build process generates two images:
 * SD-card image to be used for boot and by the Zephyr Dom0 `zephyr-dom0-xt` application;
 * USB-flash image to be used as **rootfs** by Linux operated driver domain.
 
+For build system with rootfs domd on nvme storage:
+
+```
+moulin rpi5.yaml --DOMD_ROOT nvme
+ninja
+```
+
 ## Create SD-card image
 
 ```
@@ -165,8 +172,10 @@ bcm2712-raspberrypi5-domd.dtb //Xen-Troops: Linux DomD Partial DT
 bcm2712-raspberrypi5-mmc.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable mmc in DomD
 bcm2712-raspberrypi5-usb.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable USB in DomD
 bcm2712-raspberrypi5-xen.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
+bcm2712-raspberrypi5-pcie1.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable pcie1 in DomD (nvme support)
 mmc-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with mmc support
 usb-passthrough.dtbo //Xen-Troops:Linux DomD Partial DT overlay with USB support
+pcie1-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with pcie1 support (for nvme support)
 ```
 
 In `config.txt` the kernel parameter is set to 'kernel=u-boot'
@@ -188,7 +197,7 @@ dom0/helloworld_xen-arm64 //Xen-Troops: kernel image for **helloworld_xen-arm64*
 dom0/liunx-pv-image //Xen-Troops: kernel image for **linux_pv_domu** guest domain configuration
 ```
 
-## Create USB-flash image
+## Create DomD rootfs image
 
 ```
 ninja rootfs.img
@@ -198,7 +207,7 @@ or
 ninja rootfs.img.gz
 ```
 
-### Flash USB-flash image
+### Flash rootfs image to the USB-flash
 
 To flash USB-flash image run below command:
 ```
@@ -231,6 +240,29 @@ for example with `fdisk` command, before writing **"ext4"** image.
 
 The USB-flash image content is the RPI 5 Linux rootfs based on RPI5 bsp yocto build
 [meta-raspberrypi](https://git.yoctoproject.org/meta-raspberrypi) with Xen tools enabled.
+
+### Flash rootfs image to the nvme storage
+
+* Create Sd-card with official Ubuntu from Raspberry foundation.
+* Copy file yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.exti4 to the USB-Flash dongle.
+* Boot from Sd card with Ubuntu. Plug USB-Flash dongle to the Raspberry Pi.
+* Create partition on nvme storage with command (should be issued from root account):
+```
+(
+echo o
+echo n
+echo p
+echo 1
+echo
+echo +32G
+echo w
+) | fdisk /dev/nvme0n1
+```
+* Flash **"ext4"** image:
+
+```
+dd if=<usb-dev>/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 of=/dev/nvme0n1p1 bs=1M
+```
 
 ## Testing
 

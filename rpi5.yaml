@@ -193,9 +193,11 @@ components:
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo"
         - "tmp/deploy/images/%{MACHINE}/mmc-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/pcie1-passthrough.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/wifi-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
         - "tmp/deploy/images/%{MACHINE}/Image.gz"
@@ -298,9 +300,11 @@ images:
           "mmc-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/mmc-passthrough.dtbo"
           "usb-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
           "pcie1-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/pcie1-passthrough.dtbo"
+          "wifi-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/wifi-passthrough.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo"
+          "%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       dom0:
         gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
@@ -359,3 +363,17 @@ parameters:
               conf:
                 - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo"]
                 - [MACHINE_FEATURES:append, " domd_nvme"]
+
+  ENABLE_WIFI:
+    desc: "Allow wifi in domd"
+    yes:
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [MACHINE_FEATURES:append, " domd_wifi"]
+                - [LICENSE_FLAGS_ACCEPTED, "synaptics-killswitch"]
+                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-wifi.dtbo"]
+    no:
+      default: true

@@ -11,6 +11,7 @@ to run with Xen which includes the following images:
   some of this hardware to other domains using PV backends. It has access to USB and rootfs
   is placed on USB storage.
 * A set of domains to be started from the control domain.
+* NVME stogage support as DomD rootfs.
 
 Once Zephyr control domain booted it can start other guest domains.
 
@@ -41,7 +42,7 @@ Build for the driver domain device is based on RPI5 bsp yocto build:
 
 ## Status
 
-This is release 0.1.0. This release supports the following features:
+This is release 0.2.0. This release supports the following features:
 
 * Zephyr operated control domain:
   * xen libraries integration that allows control of the other domains.
@@ -62,6 +63,7 @@ This is release 0.1.0. This release supports the following features:
   * Simple linux-based domain with initramfs
   * implements PVnet interface to access other domains via pv network;
   * impelments PVblock interface which allows to mount block devices to the domains.
+* Configuration to use either NVME or USB as a DomD rootfs storage.
 
 Testing pvnet connection instruction:
 [linux_pv_domu testing](https://github.com/xen-troops/meta-xt-rpi5/wiki/RPI5-build-Linux-domain#test)
@@ -244,7 +246,7 @@ The USB-flash image content is the RPI 5 Linux rootfs based on RPI5 bsp yocto bu
 ### Flash rootfs image to the nvme storage
 
 * Create Sd-card with official Ubuntu from Raspberry foundation.
-* Copy file yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.exti4 to the USB-Flash dongle.
+* Copy file yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 to the USB-Flash dongle.
 * Boot from Sd card with Ubuntu. Plug USB-Flash dongle to the Raspberry Pi.
 * Create partition on nvme storage with command (should be issued from root account):
 ```
@@ -1199,6 +1201,29 @@ helloworld_xen-arm64
 liunx_pv_image
 uart:~$
 ```
+
+## Features and Tasks
+
+The following list shows the list of features already implemented and plans for the future release:
+
+### Features implemented in Release v0.2
+
+ * add support to use nvme storage for DomD rootfs;
+ * OP-TEE integration enhancements;
+ * u-boot: fix driver initialization when more than 1 PCIe device enabled;
+ * add vchan test utilities to the DomD;
+ * add possibility to configure domains XSM security labels (id) for DomU(s) in the Zephyr Dom0 zephyr-dom0-xt application.
+
+### TODO
+
+ * enable scmi server in ARM-TF and port reset and pinctrl drivers;
+ * implement pinctrl-scmi protocol server in ARM-TF;
+ * implementation of the SCMI support in Zephyr for reset;
+ * integration of the SCMI Mediator support in xen. This will allow different domains to access resources;
+ * add SCMI-Agent permissions support to ARM-TF and Xen SCMI Mediator;
+ * backport pinctrl-scmi driver from master to the Raspberry PI 5 Linux kernel;
+ * configure Linux Kernel (in DomD) to use set resets and pinctrl;
+ * add wlan support to DomD. This requires SCMI to share pinctrl access.
 
 ## Wiki
 Link to the wiki pages:

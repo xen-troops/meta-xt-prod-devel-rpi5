@@ -41,7 +41,7 @@ Build for the driver domain device is based on RPI5 bsp yocto build:
 
 ## Status
 
-This is release 0.1.1. This release supports the following features:
+This is release 0.1.2. This release supports the following features:
 
 * Zephyr operated control domain:
   * xen libraries integration that allows control of the other domains.
@@ -81,7 +81,7 @@ Below dependencies have to be satisfied before start building project:
 ```
 mkdir <my_build_dir>
 cd <my_build_dir>
-curl -O https://raw.githubusercontent.com/xen-troops/meta-xt-prod-devel-rpi5/v0.1.1/rpi5.yaml
+curl -O https://raw.githubusercontent.com/xen-troops/meta-xt-prod-devel-rpi5/v0.1.2/rpi5.yaml
 moulin rpi5.yaml
 ninja
 ```
@@ -1190,3 +1190,4 @@ ninja
 | v0.1.1 | 06/20/2024| Stabilizing versions for the following components:|
 |        |           |  - xen                                            |
 |        |           |  - fatfs for zephyr-dom0-xt                       |
+| v0.1.2 | 07/29/2024| fix incompatibility with new rpi5 fw              |

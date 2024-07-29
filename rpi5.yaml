@@ -138,7 +138,7 @@ components:
         rev: "1918a27419dcd5e79954c0dc0edddcde91057a7e"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "v0.1.1"
+        rev: "v0.1.2"
 
     builder:
       type: yocto

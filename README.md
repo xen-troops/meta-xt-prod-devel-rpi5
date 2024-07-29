@@ -1239,3 +1239,18 @@ bitbake -c clean rpi-bootfiles -c clean rpi-config -c clean rpi-cmdline
 cd ../..
 ninja
 ```
+
+## ChangeLog
+| Release| Date      | Comments                                          |
+|--------|-----------|---------------------------------------------------|
+| v0.1.0 | 06/07/2024|                                                   |
+| v0.1.1 | 06/20/2024| Stabilizing versions for the following components:|
+|        |           |  - xen                                            |
+|        |           |  - fatfs for zephyr-dom0-xt                       |
+| v0.1.2 | 07/29/2024| fix incompatibility with new rpi5 fw              |
+| v0.2.0 | 08/30/2024| - add nvme storage for DomD rootfs support        |
+|        |           | - OP-TEE integration enhancements                 |
+|        |           | - u-boot: fix initialization when several PCIe    |
+|        |           |   devices enabled                                 |
+|        |           | - add vchan utilities to the DomD                 |
+|        |           | - XSM security labeld configuration               |

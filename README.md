@@ -83,7 +83,7 @@ Below dependencies have to be satisfied before start building project:
 ```
 mkdir <my_build_dir>
 cd <my_build_dir>
-curl -O https://raw.githubusercontent.com/xen-troops/meta-xt-prod-devel-rpi5/master/rpi5.yaml
+curl -O https://raw.githubusercontent.com/xen-troops/meta-xt-prod-devel-rpi5/v0.2.0/rpi5.yaml
 moulin rpi5.yaml
 ninja
 ```

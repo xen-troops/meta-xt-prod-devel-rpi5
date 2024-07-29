@@ -35,22 +35,22 @@ common_data:
   common_yocto_sources: &COMMON_YOCTO_SOURCES
     - type: git
       url: "https://git.yoctoproject.org/poky"
-      rev: "scarthgap"
+      rev: "6879650b927c96a2464224cdc2bed8245511cbf1"
     - type: git
       url: "https://git.openembedded.org/meta-openembedded"
-      rev: "scarthgap"
+      rev: "80e01188fa822d87d301ee71973c462d7a865493"
     - type: git
       url: "https://github.com/xen-troops/meta-xt-common.git"
-      rev: "master"
+      rev: "09d7a4c5fd4ebff2f78129f6798af1f4d699b26d"
     - type: git
       url: "https://git.yoctoproject.org/meta-virtualization"
-      rev: "scarthgap"
+      rev: "6a80f140e387621f62964209a2e07d3bcfb125ce"
     - type: git
       url: "https://git.yoctoproject.org/meta-selinux"
-      rev: "scarthgap"
+      rev: "9f5a46620a07d7b15722593a33e46a4d19392b75"
     - type: git
       url: "https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git"
-      rev: "main"
+      rev: "27893183c501e1df3d1d5a4cc9d43af34f7e6940"
 
   common_yocto_layers: &COMMON_YOCTO_LAYERS
     - "../meta-openembedded/meta-oe"
@@ -68,7 +68,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
-        rev: "rpi5_dom0_dev"
+        rev: "rpi5-v0.2.0"
 
     builder:
       type: zephyr
@@ -135,10 +135,10 @@ components:
       - *COMMON_YOCTO_SOURCES
       - type: git
         url: "https://git.yoctoproject.org/meta-raspberrypi"
-        rev: "scarthgap"
+        rev: "1918a27419dcd5e79954c0dc0edddcde91057a7e"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "main"
+        rev: "v0.2.0"
 
     builder:
       type: yocto

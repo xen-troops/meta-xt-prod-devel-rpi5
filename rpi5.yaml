@@ -89,7 +89,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/xen-troops/zephyr.git"
-        rev: "rpi5_dev"
+        rev: "zephyr-v3.6.0-xt"
 
     builder:
       type: zephyr
@@ -105,7 +105,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/xen-troops/zephyr.git"
-        rev: "rpi5_dev"
+        rev: "zephyr-v3.6.0-xt"
 
     builder:
       type: zephyr

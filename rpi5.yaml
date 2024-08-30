@@ -25,6 +25,7 @@ variables:
   DOMU_BUILD_DIR: "build-domu"
   XT_XEN_DTBO_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtbo"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
+  XEN_DT_SCMI_NAME: "%{SOC_FAMILY}-%{MACHINE}-scmi"
 
   XT_DOMD_IMAGE: "rpi5-image-xt-domd"
   XT_DOMU_IMAGE: "core-image-thin-initramfs"
@@ -77,6 +78,10 @@ components:
       work_dir: "%{ZEPHYR_DOM0_BUILD_DIR}"
       vars:
         - "CONFIG_DOM_STORAGE_FATFS_LOGICAL_DRIVE_NAME=\"1\""
+        - "CONFIG_ARM_SCMI=y"
+        - "CONFIG_RESET=y"
+        - "CONFIG_ARM_SCMI_SHELL=y"
+        - "CONFIG_ARM_SCMI_SMC_METHOD_HVC=y"
       target_images:
         - "%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       additional_deps:
@@ -165,6 +170,7 @@ components:
         - [PREFERRED_VERSION_xen,"4.19.0+git"]
         - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
         - [PREFERRED_VERSION_u-boot, "2024.04"]
+        - [XEN_DT_SCMI, "%{XEN_DT_SCMI_NAME}"]
 
         # RPI specific
         - [ENABLE_UART, "1"]
@@ -174,6 +180,7 @@ components:
         - [KERNEL_IMAGETYPE_UBOOT, "Image"]
         - [DISTRO_FEATURES:append, " xen"]
         - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet"]
+        - [MACHINE_FEATURES:append, " scmi"]
 
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
@@ -193,6 +200,7 @@ components:
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
         - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo"
+        - "tmp/deploy/images/%{MACHINE}/%{XEN_DT_SCMI_NAME}.dtbo"
         - "tmp/deploy/images/%{MACHINE}/mmc-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/pcie1-passthrough.dtbo"
@@ -301,6 +309,7 @@ images:
           "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-mmc.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-pcie1.dtbo"
+          "%{XEN_DT_SCMI_NAME}.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XEN_DT_SCMI_NAME}.dtbo"
           "zephyr.bin": "%{ZEPHYR_DOM0_DIR}/%{ZEPHYR_DOM0_BUILD_DIR}/zephyr/zephyr.bin"
       dom0:
         gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7

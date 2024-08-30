@@ -50,8 +50,8 @@ common_data:
       url: "https://git.yoctoproject.org/meta-selinux"
       rev: "scarthgap"
     - type: git
-      url: "https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git"
-      rev: "main"
+      url: "https://github.com/GrygiriiS/meta-xt-prod-devel-rpi5.git"
+      rev: "rpi5_scmi"
 
   common_yocto_layers: &COMMON_YOCTO_LAYERS
     - "../meta-openembedded/meta-oe"
@@ -68,8 +68,8 @@ components:
     build-dir: "%{ZEPHYR_DOM0_DIR}"
     sources:
       - type: west
-        url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
-        rev: "rpi5_dom0_dev"
+        url: "https://github.com/GrygiriiS/zephyr-dom0-xt.git"
+        rev: "rpi5_dom0_dev_scmi"
 
     builder:
       type: zephyr
@@ -142,8 +142,8 @@ components:
         url: "https://git.yoctoproject.org/meta-raspberrypi"
         rev: "scarthgap"
       - type: git
-        url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "main"
+        url: "https://github.com/GrygiriiS/meta-xt-rpi5.git"
+        rev: "rpi5_scmi"
 
     builder:
       type: yocto

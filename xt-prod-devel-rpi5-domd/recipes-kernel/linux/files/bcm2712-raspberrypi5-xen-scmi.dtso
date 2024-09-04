@@ -1,0 +1,150 @@
+// SPDX-License-Identifier: GPL-2.0
+/dts-v1/;
+/plugin/;
+
+&{/} {
+	#address-cells = <0x02>;
+	#size-cells = <0x01>;
+
+	scmi_sram: sram@3ff00000 {
+		compatible = "mmio-sram";
+		reg = <0x0 0x3ff00000 0x10000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0x0 0x3ff00000 0x10000>;
+
+		scmi_shm_0: scmi_shm@0 {
+			/* default channel */
+			compatible = "arm,scmi-shmem";
+			reg = <0 0x1000>;
+		};
+		scmi_shm_1: scmi_shm@1 {
+			/* reserved for Dom0 under Xen */
+			compatible = "arm,scmi-shmem";
+			reg = <0x1000 0x1000>;
+		};
+		scmi_shm_2: scmi_shm@2 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x2000 0x1000>;
+			xen,passthrough;
+		};
+		scmi_shm_3: scmi_shm@3 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x3000 0x1000>;
+			xen,passthrough;
+		};
+		scmi_shm_4: scmi_shm@4 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x4000 0x1000>;
+			xen,passthrough;
+		};
+		scmi_shm_5: scmi_shm@5 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x5000 0x1000>;
+			xen,passthrough;
+		};
+		scmi_shm_6: scmi_shm@6 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x6000 0x1000>;
+			xen,passthrough;
+		};
+		scmi_shm_7: scmi_shm@7 {
+			compatible = "arm,scmi-shmem";
+			reg = <0x7000 0x1000>;
+			xen,passthrough;
+		};
+	};
+
+	reserved-memory {
+	#address-cells = <0x02>;
+	#size-cells = <0x01>;
+
+		scmi_shm@3ff00000 {
+			reg = <0x0 0x3ff00000 0x10000>;
+		};
+	};
+
+	firmware {
+		scmi: scmi {
+			compatible = "arm,scmi-smc";
+			arm,smc-id = <0x82000002>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#access-controller-cells = <1>;
+			shmem = <&scmi_shm_0>;
+
+			epam,secondary-agents = <
+				1 0x82000003 &scmi_shm_1
+				2 0x82000004 &scmi_shm_2
+				3 0x82000005 &scmi_shm_3
+				4 0x82000006 &scmi_shm_4
+				5 0x82000007 &scmi_shm_5
+				6 0x82000008 &scmi_shm_6
+				7 0x82000009 &scmi_shm_7
+				>;
+
+			scmi_reset: protocol@16 {
+				reg = <0x16>;
+				#reset-cells = <1>;
+			};
+
+			scmi_pinctrl: protocol@19 {
+				reg = <0x19>;
+				#pinctrl-cells = <0>;
+
+				scmi_sdio2_30_pins: scmi_sdio2_30_pins {
+					pin_clk {
+						function = "f_sd2";
+						pins = "gpio30";
+						bias-disable;
+					};
+					pin_cmd {
+						function = "f_sd2";
+						pins = "gpio31";
+						bias-pull-up;
+					};
+					pins_dat {
+						function = "f_sd2";
+						pins = "gpio32", "gpio33", "gpio34", "gpio35";
+						bias-pull-up;
+					};
+				};
+
+				scmi_pwr_button_pins: scmi_pwr_button_pins {
+					function = "f_gpio";
+					pins = "gpio20";
+					bias-pull-up;
+				};
+
+			};
+		};
+	};
+};
+
+&{/chosen/domD/} {
+	xen,arm_sci = "scmi_smc";
+};
+
+&{/pwr_button/} {
+	pinctrl-0 = <&scmi_pwr_button_pins>;
+};
+
+&pcie1 {
+	resets = <&scmi_reset 0>, <&scmi_reset 1>, <&pcie_rescal>;
+	access-controllers = <&scmi 1>;
+};
+
+&pcie2 {
+	resets = <&scmi_reset 2>, <&scmi_reset 3>, <&pcie_rescal>;
+	access-controllers = <&scmi 2>;
+};
+
+&sdio1 {
+	access-controllers = <&scmi 3>;
+};
+
+&sdio2 {
+	pinctrl-0 = <&scmi_sdio2_30_pins>;
+	access-controllers = <&scmi 4>;
+};
+

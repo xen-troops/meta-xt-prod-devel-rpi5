@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2024 EPAM systems
+ *
+ * SPDX-License-Identifier: Apache-2.0
+*/
+/dts-v1/;
+/plugin/;
+
+&pcie1 {
+	resets = <&scmi_reset 0>, <&scmi_reset 1>, <&reset_controller119500>;
+};

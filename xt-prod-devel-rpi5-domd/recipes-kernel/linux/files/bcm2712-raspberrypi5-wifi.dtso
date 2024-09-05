@@ -1,0 +1,108 @@
+
+/*
+ * Copyright (c) 2024 EPAM systems
+ *
+ * SPDX-License-Identifier: Apache-2.0
+*/
+/dts-v1/;
+/plugin/;
+
+&passthrough {
+	clk_emmc2: clk_emmc2 {
+		compatible = "fixed-clock";
+		#clock-cells = <0x0>;
+		clock-output-names = "emmc2-clock";
+		clock-frequency = <200000000>;
+	};
+
+	mmc1001100000: mmc@1001100000 {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		compatible = "brcm,bcm2712-sdhci";
+		interrupt-parent = <&gic>;
+		interrupts = <0x00 0x112 0x04>;
+		reg = <0x10 0x1100000 0x00 0x260 0x10 0x1100400 0x00 0x200>;
+		reg-names = "host", "cfg";
+		clocks = <&clk_emmc2>;
+		sdhci-caps-mask = <0xc000 0x00>;
+		sdhci-caps = <0x00 0x00>;
+		supports-cqe;
+		mmc-ddr-3_3v;
+		bus-width = <0x04>;
+		vmmc-supply = <&wl_on_reg>;
+		sd-uhs-ddr50;
+		non-removable;
+		pinctrl-0 = <&scmi_sdio2_30_pins>;
+		pinctrl-names = "default";
+		xen,path = "/axi/mmc@1100000";
+		xen,force-assign-without-iommu;
+		xen,reg = <0x10 0x1100000 0x00 0x1000 0x10 0x1100000>;
+		status = "okay";
+
+		wifi@1 {
+			reg = <0x01>;
+			compatible = "brcm,bcm4329-fmac";
+			local-mac-address = [00 00 00 00 00 00];
+		};
+	};
+
+	gpio7d508500: gpio@107d508500 {
+		compatible = "brcm,brcmstb-gpio";
+		#gpio-cells = <0x02>;
+		gpio-controller;
+		reg = <0x10 0x7d508500 0x0 0x40>;
+		brcm,gpio-direct;
+		brcm,gpio-bank-widths = <32 4>;
+		gpio-line-names =
+			"", // GPIO_000
+			"2712_BOOT_CS_N", // GPIO_001
+			"2712_BOOT_MISO", // GPIO_002
+			"2712_BOOT_MOSI", // GPIO_003
+			"2712_BOOT_SCLK", // GPIO_004
+			"", // GPIO_005
+			"", // GPIO_006
+			"", // GPIO_007
+			"", // GPIO_008
+			"", // GPIO_009
+			"", // GPIO_010
+			"", // GPIO_011
+			"", // GPIO_012
+			"", // GPIO_013
+			"PCIE_SDA", // GPIO_014
+			"PCIE_SCL", // GPIO_015
+			"", // GPIO_016
+			"", // GPIO_017
+			"-", // GPIO_018
+			"-", // GPIO_019
+			"PWR_GPIO", // GPIO_020
+			"2712_G21_FS", // GPIO_021
+			"-", // GPIO_022
+			"-", // GPIO_023
+			"BT_RTS", // GPIO_024
+			"BT_CTS", // GPIO_025
+			"BT_TXD", // GPIO_026
+			"BT_RXD", // GPIO_027
+			"WL_ON", // GPIO_028
+			"BT_ON", // GPIO_029
+			"WIFI_SDIO_CLK", // GPIO_030
+			"WIFI_SDIO_CMD", // GPIO_031
+			"WIFI_SDIO_D0", // GPIO_032
+			"WIFI_SDIO_D1", // GPIO_033
+			"WIFI_SDIO_D2", // GPIO_034
+			"WIFI_SDIO_D3"; // GPIO_035
+		xen,path = "/soc/gpio@7d517c00";
+		xen,force-assign-without-iommu;
+		xen,reg = <0x10 0x7d508000 0x0 0x1000 0x10 0x7d508000>;
+	};
+
+	wl_on_reg: wl_on_reg {
+		compatible = "regulator-fixed";
+		regulator-name = "wl-on-regulator";
+		regulator-min-microvolt = <0x325aa0>;
+		regulator-max-microvolt = <0x325aa0>;
+		gpio = <&gpio7d508500 0x1c 0x00>;
+		startup-delay-us = <0x249f0>;
+		enable-active-high;
+	};
+};
+

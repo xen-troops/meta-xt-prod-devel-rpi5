@@ -3,9 +3,7 @@ min_ver: "0.24"
 
 variables:
   # Common build configuration
-
   YOCTOS_WORK_DIR: "yocto"
-
   DOM0_OS: "zephyr"
 
   # Raspberry 5 build configuration
@@ -86,7 +84,6 @@ components:
       - type: west
         url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
         rev: "rpi5_dom0_dev"
-
     builder:
       type: zephyr
       board: "%{ZEPHYR_DOM0_MACHINE}"
@@ -107,7 +104,6 @@ components:
       - type: west
         url: "https://github.com/xen-troops/zephyr.git"
         rev: "zephyr-v3.6.0-xt"
-
     builder:
       type: zephyr
       board: xenvm
@@ -123,7 +119,6 @@ components:
       - type: west
         url: "https://github.com/xen-troops/zephyr.git"
         rev: "zephyr-v3.6.0-xt"
-
     builder:
       type: zephyr
       board: xenvm
@@ -142,7 +137,6 @@ components:
         url: https://github.com/aoscloud/demo-services/raw/main/monkey_zephyr/src/helloworld_xen-arm64
         file: helloworld_xen-arm64
         dir: "."
-
     builder:
       type: "null"
 
@@ -156,7 +150,6 @@ components:
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
         rev: "main"
-
     builder:
       type: yocto
       work_dir: "%{DOMD_BUILD_DIR}"
@@ -171,7 +164,6 @@ components:
         - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
         - [PREFERRED_VERSION_u-boot, "2024.04"]
         - [XEN_DT_SCMI, "%{XEN_DT_SCMI_NAME}"]
-
         # RPI specific
         - [ENABLE_UART, "1"]
         - [RPI_USE_U_BOOT, "1"]
@@ -180,7 +172,6 @@ components:
         - [KERNEL_IMAGETYPE_UBOOT, "Image"]
         - [DISTRO_FEATURES:append, " xen"]
         - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet"]
-
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
         - *COMMON_YOCTO_LAYERS
@@ -190,7 +181,6 @@ components:
         - "../meta-xt-common/meta-xt-security"
         - "../meta-xt-rpi5"
         - "../meta-xt-prod-devel-rpi5/xt-prod-devel-rpi5-domd"
-
       target_images:
         - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"
         - "tmp/deploy/images/%{MACHINE}/xenpolicy-%{MACHINE}"
@@ -225,6 +215,7 @@ components:
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4db.elf"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4cd.elf"
         - "tmp/deploy/images/%{MACHINE}/bootfiles/start4x.elf"
+
   domu:
     build-dir: "%{YOCTOS_WORK_DIR}"
     sources:
@@ -236,7 +227,6 @@ components:
         - *LINUX_DOMAIN_CONF
         - [MACHINE, "%{DOMU_MACHINE}"]
         - [XT_DOM_NAME, "domu"]
-        - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
         # Bundle initramfs into kernel image
         - [INITRAMFS_IMAGE, "%{XT_DOMU_IMAGE}"]
         - [INITRAMFS_IMAGE_NAME, "${INITRAMFS_IMAGE}${IMAGE_MACHINE_SUFFIX}.rootfs"]
@@ -246,7 +236,6 @@ components:
         - *COMMON_YOCTO_LAYERS
         - "../meta-xt-common/meta-xt-domu"
         - "../meta-xt-prod-devel-rpi5/xt-prod-devel-rpi5-domu"
-
       target_images:
         - "tmp/deploy/images/%{DOMU_MACHINE}/Image-initramfs-%{DOMU_MACHINE}.bin"
 
@@ -330,7 +319,6 @@ parameters:
         variables:
           MACHINE: "raspberrypi5"
           SOC_FAMILY: "bcm2712"
-          ZEPHYR_DOM0_DIR: "zephyr"
 
   DOMD_ROOT:
     desc: "Domd root device"
@@ -345,7 +333,6 @@ parameters:
               conf:
                 - [DOMD_OVERLAYS, "%{SOC_FAMILY}-%{MACHINE}-usb.dtbo"]
                 - [MACHINE_FEATURES:append, " domd_usb"]
-
     nvme:
       overrides:
         variables:

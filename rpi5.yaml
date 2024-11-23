@@ -145,8 +145,8 @@ components:
       type: yocto
       work_dir: "%{DOMD_BUILD_DIR}"
       conf:
-        - [SSTATE_DIR, "${TOPDIR}/../../../common_data/sstate"]
-        - [DL_DIR, "${TOPDIR}/../../../common_data/downloads"]
+        - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
+        - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
         # Skip warning about missing "virtualization" distro feature
         - [SKIP_META_VIRT_SANITY_CHECK, "1"]
         # Init manager
@@ -229,8 +229,8 @@ components:
       type: yocto
       work_dir: "%{DOMU_BUILD_DIR}"
       conf:
-        - [SSTATE_DIR, "${TOPDIR}/../../../common_data/sstate"]
-        - [DL_DIR, "${TOPDIR}/../../../common_data/downloads"]
+        - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
+        - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
         # Skip warning about missing "virtualization" distro feature
         - [SKIP_META_VIRT_SANITY_CHECK, "1"]
         # Init manager

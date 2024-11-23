@@ -62,6 +62,22 @@ common_data:
     - "../meta-selinux"
     - "../meta-virtualization"
 
+  # Conf options for domain that use linux
+  linux_domain_conf: &LINUX_DOMAIN_CONF
+    - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
+    - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
+    # Skip warning about missing "virtualization" distro feature
+    - [SKIP_META_VIRT_SANITY_CHECK, "1"]
+    # Init manager
+    - [INIT_MANAGER, "systemd"]
+    # Do not install kernel image to rootfs to decrease initrd size
+    - ["RDEPENDS_${KERNEL_PACKAGE_NAME}-base", ""]
+    # Remove features that we are not used
+    - [DISTRO_FEATURES:remove,
+        "x11 gtk gobject-introspection-data nfc irda zeroconf 3g sysvinit
+         acl alsa argp pcmcia usbgadget opengl ptest multiarch wayland
+         vulkan sysvinit"]
+
 components:
   dom0:
     default: true
@@ -145,19 +161,7 @@ components:
       type: yocto
       work_dir: "%{DOMD_BUILD_DIR}"
       conf:
-        - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
-        - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
-        # Skip warning about missing "virtualization" distro feature
-        - [SKIP_META_VIRT_SANITY_CHECK, "1"]
-        # Init manager
-        - [INIT_MANAGER, "systemd"]
-        # Do not install kernel image to rootfs to decrease initrd size
-        - ["RDEPENDS_${KERNEL_PACKAGE_NAME}-base", ""]
-        # Remove features that we are not using
-        - [DISTRO_FEATURES:remove,
-            "x11 gtk gobject-introspection-data nfc irda zeroconf 3g sysvinit
-             acl alsa argp pcmcia usbgadget opengl ptest multiarch wayland
-             vulkan sysvinit"]
+        - *LINUX_DOMAIN_CONF
         - [MACHINE, "%{MACHINE}"]
         - [RPI_SOC_FAMILY, "%{SOC_FAMILY}"]
         - [XT_DOM_NAME, "domd"]
@@ -229,19 +233,7 @@ components:
       type: yocto
       work_dir: "%{DOMU_BUILD_DIR}"
       conf:
-        - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
-        - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
-        # Skip warning about missing "virtualization" distro feature
-        - [SKIP_META_VIRT_SANITY_CHECK, "1"]
-        # Init manager
-        - [INIT_MANAGER, "systemd"]
-        # Do not install kernel image to rootfs to decrease initrd size
-        - ["RDEPENDS_${KERNEL_PACKAGE_NAME}-base", ""]
-        # Remove features that we are not using
-        - [DISTRO_FEATURES:remove,
-            "x11 gtk gobject-introspection-data nfc irda zeroconf 3g sysvinit
-             acl alsa argp pcmcia usbgadget opengl ptest multiarch wayland
-             vulkan sysvinit"]
+        - *LINUX_DOMAIN_CONF
         - [MACHINE, "%{DOMU_MACHINE}"]
         - [XT_DOM_NAME, "domu"]
         - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]

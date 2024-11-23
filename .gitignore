@@ -1,0 +1,11 @@
+.ninja_deps
+.ninja_log
+.stamps/
+build.ninja
+yocto/
+zephyr/
+zephyr_blinky/
+zephyr_sync/
+domu_unikraft/
+full.img*
+rootfs.img*

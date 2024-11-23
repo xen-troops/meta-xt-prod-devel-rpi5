@@ -25,6 +25,62 @@ The Zephyr Dom0 `zephyr-dom0-xt` provides following guest domain configurations:
   which starts Unikraft kernel. It is based on "Unikraft helloworld" and "monkey" examples.
 - **linux_pv_domu**: The Linux based Xen guest domain with initrams and PV network support.
 
+Fetching
+
+You can clone this whole repository, or download it as an archive.
+During the build few directories will be created and additional
+dependencies will be fetched into them.
+The build system will create build directory `yocto/` for yocto's
+meta-layers, and `zephyr/` for the Dom0 with Zephyr OS.
+
+Building
+
+Moulin is used to generate Ninja build file: `moulin
+rpi5.yaml`. This project provides number of additional
+parameters. You can check them with `--help-config` command
+line option:
+
+```
+$ moulin rpi5.yaml --help-config
+usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}]
+
+Config file description: Raspberry 5 with xen dom0less
+
+optional arguments:
+  --MACHINE {rpi5}      Raspberry Pi machines (default: rpi5)
+  --DOMD_ROOT {usb,nvme}
+                        Domd root device (default: usb)
+  --ENABLE_SCMI {yes,no}
+                        Enable ARM SCMI support (default: no)
+  --ENABLE_WIFI {yes,no}
+                        Allow wifi in domd (default: no)
+```
+
+You can choose root device for the DomD, enable SCMI and WiFi.
+
+Moulin will generate `build.ninja` file. After that run `ninja` to
+build the image. This will take some time and disk space as it builds
+a few separate OS images.
+
+Build products
+
+During the build the following artifacts will be created.
+
+After `moulin rpi5.yaml`:
+```
+| build.ninja
+```
+
+After `ninja full.img`
+```
+| .stamps/
+| .ninja_*
+| yocto/            # Linux-based domains
+  | build_dom?/
+  | <fetched meta layers>/
+| zephyr/           # Zephyr-based domain
+```
+
 Boot process:
 
 * RPI5 bootloder started **u-boot**

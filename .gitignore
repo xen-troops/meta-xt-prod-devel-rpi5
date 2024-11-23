@@ -1,0 +1,8 @@
+.ninja_deps
+.ninja_log
+.stamps/
+build.ninja
+yocto/
+zephyr/
+android/
+android_kernel/

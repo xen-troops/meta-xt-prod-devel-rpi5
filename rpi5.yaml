@@ -161,6 +161,7 @@ components:
         - [PREFERRED_VERSION_xen-tools, "4.19.0+git"]
         - [PREFERRED_VERSION_u-boot, "2024.04"]
         - [XEN_DT_SCMI, "%{XEN_DT_SCMI_NAME}"]
+        - [PREFERRED_VERSION_linux-raspberrypi, "6.6.%"]
         # RPI specific
         - [ENABLE_UART, "1"]
         - [RPI_USE_U_BOOT, "1"]

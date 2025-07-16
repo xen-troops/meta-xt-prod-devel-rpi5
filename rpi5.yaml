@@ -34,19 +34,19 @@ common_data:
   common_yocto_sources: &COMMON_YOCTO_SOURCES
     - type: git
       url: "https://git.yoctoproject.org/poky"
-      rev: "scarthgap"
+      rev: "7bb9c2255b3aed8441fba1133f350b223a3b6379"
     - type: git
       url: "https://git.openembedded.org/meta-openembedded"
-      rev: "scarthgap"
+      rev: "727811eaf256b88fd135be99559f2cbf14c82fce"
     - type: git
       url: "https://github.com/xen-troops/meta-xt-common.git"
-      rev: "master"
+      rev: "3f17cfe7a64491ff854a34aa76a90b3235723bc1"
     - type: git
       url: "https://git.yoctoproject.org/meta-virtualization"
-      rev: "scarthgap"
+      rev: "9e040ee8dd6025558ea60ac9db60c41bfeddf221"
     - type: git
       url: "https://git.yoctoproject.org/meta-selinux"
-      rev: "scarthgap"
+      rev: "c4b059262089b74c8fbf8dd5fdf5fd7bc1deeddc"
 
   common_yocto_layers: &COMMON_YOCTO_LAYERS
     - "../meta-openembedded/meta-oe"
@@ -143,7 +143,7 @@ components:
       - *COMMON_YOCTO_SOURCES
       - type: git
         url: "https://git.yoctoproject.org/meta-raspberrypi"
-        rev: "scarthgap"
+        rev: "48452445d779b0f69bf1ead12b3850d50eb8920d"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
         rev: "main"

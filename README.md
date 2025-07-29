@@ -42,7 +42,7 @@ line option:
 
 ```
 $ moulin rpi5.yaml --help-config
-usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}]
+usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}] [--ENABLE_CAN {yes,no}]
 
 Config file description: Raspberry 5 with xen dom0less
 
@@ -54,9 +54,11 @@ optional arguments:
                         Enable ARM SCMI support (default: no)
   --ENABLE_WIFI {yes,no}
                         Allow wifi in domd (default: no)
+  --ENABLE_CAN {yes,no}
+                        Allow CAN in domd (default: no)
 ```
 
-You can choose root device for the DomD, enable SCMI and WiFi.
+You can choose root device for the DomD, enable SCMI, WiFi and CAN.
 
 Moulin will generate `build.ninja` file. After that run `ninja` to
 build the image. This will take some time and disk space as it builds

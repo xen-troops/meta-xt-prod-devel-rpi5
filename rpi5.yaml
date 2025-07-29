@@ -379,3 +379,25 @@ parameters:
                   "wifi-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/wifi-passthrough.dtbo"
     no:
       default: true
+
+  ENABLE_CAN:
+    desc: "Allow CAN in domd"
+    yes:
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [MACHINE_FEATURES:append, " domd_can"]
+                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can.dtbo"]
+              target_images:
+                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can.dtbo"
+
+        images:
+          full:
+            partitions:
+              boot:
+                items:
+                  "%{SOC_FAMILY}-%{MACHINE}-can.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can.dtbo"
+    no:
+      default: true

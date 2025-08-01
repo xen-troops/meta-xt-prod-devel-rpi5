@@ -18,8 +18,8 @@ Once Zephyr control domain booted it can start other guest domains.
 The Zephyr Dom0 `zephyr-dom0-xt` provides following guest domain configurations:
 
 - **rpi_5_domd**: The Xen guest domain configuration which uses real RPI5 GPIO HW
-  ``/soc/gpio@7d517c00``. It's based on Zephyr Blinky sample.
-- **rpi_5_domu**: The Xen guest domain configuration which is starts Xen guest domain without
+  ``/soc/gpio@7d517c00``. It's based on the Zephyr Blinky sample.
+- **rpi_5_domu**: The Xen guest domain configuration that starts the Xen guest domain without
   using real RPI5 HW. It's based on Zephyr samples/synchronization sample.
 - **helloworld_xen-arm64**: The Xen guest domain configuration without using real RPI5 HW
   which starts Unikraft kernel. It is based on "Unikraft helloworld" and "monkey" examples.
@@ -138,10 +138,19 @@ Below dependencies have to be satisfied before start building project:
 
 ## Build
 
+You can clone this whole repository or download it as an archive. During
+the build, a few directories will be created, and additional dependencies
+will be fetched into them.
+
+**NOTE:** Please ensure that your storage devices do not use ``ecryptfs`` or other
+file systems that impose filename length limitations. Yocto requires a
+file system that supports long file names. Failure to meet this
+requirement will result in an error during the build process.
+
+To start build run:
+
 ```
-mkdir <my_build_dir>
-cd <my_build_dir>
-curl -O https://raw.githubusercontent.com/xen-troops/meta-xt-prod-devel-rpi5/master/rpi5.yaml
+cd meta-xt-prod-devel-rpi5
 moulin rpi5.yaml
 ninja
 ```
@@ -296,16 +305,16 @@ dd if=yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspber
 **NOTE:** In case of **"ext4"** image usage the media should be properly partitioned,
 for example with `fdisk` command, before writing **"ext4"** image.
 
-### USB-flash image content
+#### USB-flash image content
 
 The USB-flash image content is the RPI 5 Linux rootfs based on RPI5 bsp yocto build
 [meta-raspberrypi](https://git.yoctoproject.org/meta-raspberrypi) with Xen tools enabled.
 
 ### Flash rootfs image to the nvme storage
 
-* Create Sd-card with official Ubuntu from Raspberry foundation.
+* Create SD-card with official Ubuntu from Raspberry foundation.
 * Copy file yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 to the USB-Flash dongle.
-* Boot from Sd card with Ubuntu. Plug USB-Flash dongle to the Raspberry Pi.
+* Boot from SD-card with Ubuntu. Plug USB-Flash dongle to the Raspberry Pi.
 * Create partition on nvme storage with command (should be issued from root account):
 ```
 (
@@ -358,8 +367,11 @@ control domain console:
 	xu console <domain id>
 ```
 
-To switch between control domain and driver domain consoles
-please press "Ctrl + A" 6 times.
+To switch between control domain and driver domain consoles please press
+"Ctrl + a" 3 times.
+
+**NOTE**: If you use the console which have "Ctrl + a" as the command
+key (for example, minicom), you need to press 6 times instead of 3.
 
 Current domain id can be get by using command:
 ```
@@ -879,7 +891,14 @@ testing and development purposes only. It is recommended that you create your
 own distribution for production use.
 ```
 
-To test PVnet connection please execute the following commands:
+### Test PVnet connection
+
+-  Connect host to your rpi board using ethernet.
+-  Set static ip address to the ethernet interface on your PC (in this
+   example will be used `192.168.0.1/24`)
+
+Set the IP address to the interface from the **linux_pv_domu**, for that,
+please execute the following commands:
 ```
 ip a
 ip addr add dev enX0 192.168.0.2/24
@@ -900,8 +919,83 @@ root@generic-armv8-xt-domu:~# ip a
     inet6 fe80::a00:27ff:feff:cbce/64 scope link
        valid_lft forever preferred_lft forever
 root@generic-armv8-xt-domu:~# ip addr add dev enX0 192.168.0.2/24
-root@generic-armv8-xt-domu:~# ping -c 3 192.,168.0.2
-ping: bad address '192.,168.0.2'
+```
+
+Add interfaces to the bridge from driver domain. To switch between control
+domain (`DOM0`) and driver domain console (`DOM1`) press "Ctrl + a"
+3 times.
+
+**NOTE**: If you use the console which have "Ctrl + a" as the command
+key (for example, minicom), you need to press 6 times instead of 3.
+
+```
+root@generic-armv8-xt-domu:~# (XEN) *** Serial input to DOM1 (type 'CTRL-a' three times to switch input)
+
+(XEN) root@raspberrypi5-domd:~#
+```
+
+To check the existing bridges and added interfaces run:
+
+```
+(XEN) root@raspberrypi5-domd:~# brctl show
+(XEN) bridge name       bridge id               STP enabled     interfaces
+(XEN) xenbr0            8000.4642d444db1c       no              eth0
+(XEN)                                                   vif4.0
+```
+
+If you don’t see the bridge with two interfaces, one for ethernet and
+another virtual, like in the example above, than add it using the
+command:
+
+```
+brctl addif <bridge_name> <interface_name>
+```
+
+To find out the names of bridge and interfaces check the output of
+`ip a`:
+```
+(XEN) root@raspberrypi5-domd:~# ip a
+(XEN) 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+(XEN)     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+(XEN)     inet 127.0.0.1/8 scope host lo
+(XEN)        valid_lft forever preferred_lft forever
+(XEN)     inet6 ::1/128 scope host noprefixroute
+(XEN)        valid_lft forever preferred_lft forever
+(XEN) 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master xenbr0 qlen 1000
+(XEN)     link/ether 2c:cf:67:32:82:7f brd ff:ff:ff:ff:ff:ff
+(XEN)     inet6 fe80::2ecf:67ff:fe32:827f/64 scope link
+(XEN)        valid_lft forever preferred_lft forever
+(XEN) 3: xenbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue qlen 1000
+(XEN)     link/ether 46:42:d4:44:db:1c brd ff:ff:ff:ff:ff:ff
+(XEN)     inet 192.168.11.1/24 brd 192.168.11.255 scope global xenbr0
+(XEN)        valid_lft forever preferred_lft forever
+(XEN)     inet6 fe80::4442:d4ff:fe44:db1c/64 scope link
+(XEN)        valid_lft forever preferred_lft forever
+(XEN) 5: vif4.0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master xenbr0 qlen 1000
+(XEN)     link/ether fe:ff:ff:ff:ff:ff brd ff:ff:ff:ff:ff:ff
+(XEN)     inet6 fe80::fcff:ffff:feff:ffff/64 scope link
+(XEN)        valid_lft forever preferred_lft forever
+```
+
+In these example:
+```
+(XEN) root@raspberrypi5-domd:~# brctl addif xenbr0 eth0
+(XEN) root@raspberrypi5-domd:~# brctl addif xenbr0 vif8.0
+```
+Switch to the control domain with **linux_pv_domu** console by pressing
+"Ctrl + a" 3 times twice.
+
+**NOTE**: If you use the console which have "Ctrl + a" as the command
+key (for example, minicom), you need to press 6 times instead of 3.
+
+To test connection run the following command:
+```
+ping -c 3 192.168.0.1
+```
+
+The output should be like that:
+
+```
 root@generic-armv8-xt-domu:~# ping -c 3 192.168.0.1
 PING 192.168.0.1 (192.168.0.1): 56 data bytes
 64 bytes from 192.168.0.1: seq=0 ttl=64 time=0.239 ms

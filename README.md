@@ -25,7 +25,7 @@ The Zephyr Dom0 `zephyr-dom0-xt` provides following guest domain configurations:
   which starts Unikraft kernel. It is based on "Unikraft helloworld" and "monkey" examples.
 - **linux_pv_domu**: The Linux based Xen guest domain with initrams and PV network support.
 
-Fetching
+#### Fetching
 
 You can clone this whole repository, or download it as an archive.
 During the build few directories will be created and additional
@@ -33,7 +33,7 @@ dependencies will be fetched into them.
 The build system will create build directory `yocto/` for yocto's
 meta-layers, and `zephyr/` for the Dom0 with Zephyr OS.
 
-Building
+#### Building
 
 Moulin is used to generate Ninja build file: `moulin
 rpi5.yaml`. This project provides number of additional
@@ -64,7 +64,7 @@ Moulin will generate `build.ninja` file. After that run `ninja` to
 build the image. This will take some time and disk space as it builds
 a few separate OS images.
 
-Build products
+#### Build products
 
 During the build the following artifacts will be created.
 
@@ -83,7 +83,7 @@ After `ninja full.img`
 | zephyr/           # Zephyr-based domain
 ```
 
-Boot process:
+#### Boot process:
 
 * RPI5 bootloder started **u-boot**
 * **u-boot** executes boot script:

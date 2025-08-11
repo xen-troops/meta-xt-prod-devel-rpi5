@@ -10,10 +10,16 @@ WIFI_PACKAGES = "			\
     kernel-module-brcmfmac		\
 "
 
+CAN_PACKAGES = "			\
+    iproute2				\
+    can-utils				\
+"
+
 IMAGE_INSTALL:append = "	\
     optee-test			\
     xen-tools-vchan		\
     ${@bb.utils.contains("MACHINE_FEATURES", "domd_wifi", "${WIFI_PACKAGES}", "" ,d)} \
+    ${@bb.utils.contains("MACHINE_FEATURES", "domd_can", "${CAN_PACKAGES}", "" ,d)}   \
 "
 
 # rootfs have to be 8 GiB, expressed in KiB

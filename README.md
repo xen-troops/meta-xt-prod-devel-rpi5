@@ -242,6 +242,7 @@ bcm2712-raspberrypi5-mmc.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to 
 bcm2712-raspberrypi5-usb.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable USB in DomD
 bcm2712-raspberrypi5-xen.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
 bcm2712-raspberrypi5-pcie1.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable pcie1 in DomD (nvme support)
+bcm2712-raspberrypi5-can.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable CAN in DomD (can support)
 mmc-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with mmc support
 usb-passthrough.dtbo //Xen-Troops:Linux DomD Partial DT overlay with USB support
 pcie1-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with pcie1 support (for nvme support)
@@ -1015,6 +1016,72 @@ will not be accessible any more.
 ```
 uart:~$ xu destroy 5
 domain:4 destroyed
+```
+
+## Testing CAN loopback in DomD
+
+**NOTE**: CAN support requires using the additional parameter `--ENABLE_CAN yes`
+while generating Ninja build file.
+
+To switch between control domain (`DOM0`) and driver domain console (`DOM1`)
+press "Ctrl + a" 3 times.
+
+**NOTE**: If you use the console which have "Ctrl + a" as the command
+key (for example, minicom), you need to press 6 times instead of 3.
+
+Check if CAN interfaces initialize successfully:
+```
+dmesg | grep spi
+```
+The output should be like these
+```
+(XEN) root@raspberrypi5-domd:~# dmesg | grep spi
+(XEN) [    1.371594] mcp251x spi0.0 can0: MCP2515 successfully initialized.
+(XEN) [    1.384168] mcp251x spi0.1 can1: MCP2515 successfully initialized.
+```
+Set up CAN
+```
+ip link set can0 up type can bitrate 1000000
+ip link set can1 up type can bitrate 1000000
+ifconfig can0 txqueuelen 65536
+ifconfig can1 txqueuelen 65536
+```
+Connect CAN0_H to CAN1_L and CAN1_H to CAN0_L on the 2-CH CAN HAT.
+
+Using `ifconfig` fix down the amount of RX/TX packets on each CAN interface.
+
+Start receiving from `can0` in background with redirecting to the file:
+```
+candump can0 >> can0.txt &
+```
+Send some data with `can1`:
+```
+cansend can1 000#11.22.33.44
+```
+Using `fg` and "Ctrl + c" brings a background process to the foreground
+and finishes it.
+
+Check the content of file `can0.txt`
+```
+(XEN) root@raspberrypi5-domd:~# cat can0.txt
+(XEN)   can0  000   [4]  11 22 33 44
+```
+Check the increased amount of TX/RX packets in `ifconfig`:
+```
+(XEN) root@raspberrypi5-domd:~# ifconfig
+(XEN) can0      Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+(XEN)           UP RUNNING NOARP  MTU:16  Metric:1
+(XEN)           RX packets:1 errors:0 dropped:0 overruns:0 frame:0
+(XEN)           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+(XEN)           collisions:0 txqueuelen:65536
+(XEN)           RX bytes:4 (4.0 B)  TX bytes:0 (0.0 B)
+(XEN)
+(XEN) can1      Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+(XEN)           UP RUNNING NOARP  MTU:16  Metric:1
+(XEN)           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+(XEN)           TX packets:1 errors:0 dropped:0 overruns:0 carrier:0
+(XEN)           collisions:0 txqueuelen:65536
+(XEN)           RX bytes:0 (0.0 B)  TX bytes:4 (4.0 B)
 ```
 
 ## Bootlog

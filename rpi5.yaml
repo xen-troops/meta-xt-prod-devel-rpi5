@@ -80,7 +80,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/xen-troops/zephyr-dom0-xt.git"
-        rev: "rpi5_dom0_dev"
+        rev: "rpi5-v0.3.0"
     builder:
       type: zephyr
       board: "%{ZEPHYR_DOM0_MACHINE}"
@@ -146,7 +146,7 @@ components:
         rev: "48452445d779b0f69bf1ead12b3850d50eb8920d"
       - type: git
         url: "https://github.com/xen-troops/meta-xt-rpi5.git"
-        rev: "main"
+        rev: "v0.3.0"
     builder:
       type: yocto
       work_dir: "%{DOMD_BUILD_DIR}"

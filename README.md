@@ -100,14 +100,16 @@ Build for the driver domain device is based on RPI5 bsp yocto build:
 
 ## Status
 
-This is release 0.2.0. This release supports the following features:
+This is release 0.3.0. This release supports the following features:
 
 * Zephyr operated control domain:
   * xen libraries integration that allows control of the other domains.
   * domd with running OCI containers as Aos services capability.
-* Linux operated driver domain:
+* Linux operated driver domain (DomD):
   * controls hardware;
-  * provides PV backends for the domains.
+  * provides PV backends for the domains;
+  * supports 2-CH CAN HAT;
+  * supports WiFi.
 * rpi_5_domd domain
   * zephyr-based domain built on top of zephyr-blinky sample;
   * GPIO device passedthrough to the domain to control onboard LED;
@@ -221,6 +223,7 @@ fixup_cd.dat //RPI5
 fixup.dat //RPI5
 fixup_db.dat //RPI5
 fixup_x.dat //RPI5
+overlays/bcm2712d0.dtbo //RPI5
 start4cd.elf //RPI5
 start4db.elf //RPI5
 start4.elf //RPI5
@@ -1473,3 +1476,7 @@ ninja
 |        |           |   devices enabled                                 |
 |        |           | - add vchan utilities to the DomD                 |
 |        |           | - XSM security labeld configuration               |
+| v0.3.0 | 08/13/2025| - add CAN support to domd                         |
+|        |           | - add WiFi support to domd                        |
+|        |           | - fix console for rpi5 1.1 rev boards             |
+|        |           | - reorganize the build                            |

@@ -100,7 +100,7 @@ Build for the driver domain device is based on RPI5 bsp yocto build:
 
 ## Status
 
-This is release 0.3.0. This release supports the following features:
+This is release 0.3.1. This release supports the following features:
 
 * Zephyr operated control domain:
   * xen libraries integration that allows control of the other domains.
@@ -1428,13 +1428,11 @@ uart:~$
 
 The following list shows the list of features already implemented and plans for the future release:
 
-### Features implemented in Release v0.2
+### Features implemented in Release v0.3
 
- * add support to use nvme storage for DomD rootfs;
- * OP-TEE integration enhancements;
- * u-boot: fix driver initialization when more than 1 PCIe device enabled;
- * add vchan test utilities to the DomD;
- * add possibility to configure domains XSM security labels (id) for DomU(s) in the Zephyr Dom0 zephyr-dom0-xt application.
+ * add CAN support to DomD
+ * fix console for Raspberry PI 5 1.1 revision boards
+ * reorganize the build
 
 ### TODO
 
@@ -1476,7 +1474,8 @@ ninja
 |        |           |   devices enabled                                 |
 |        |           | - add vchan utilities to the DomD                 |
 |        |           | - XSM security labeld configuration               |
-| v0.3.0 | 08/13/2025| - add CAN support to domd                         |
+| v0.3.0 | 08/12/2025| - add CAN support to domd                         |
 |        |           | - add WiFi support to domd                        |
 |        |           | - fix console for rpi5 1.1 rev boards             |
 |        |           | - reorganize the build                            |
+| v0.3.1 | 08/13/2025| add release tag for meta-xt-common                |

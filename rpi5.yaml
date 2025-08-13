@@ -40,7 +40,7 @@ common_data:
       rev: "727811eaf256b88fd135be99559f2cbf14c82fce"
     - type: git
       url: "https://github.com/xen-troops/meta-xt-common.git"
-      rev: "3f17cfe7a64491ff854a34aa76a90b3235723bc1"
+      rev: "v0.3.0"
     - type: git
       url: "https://git.yoctoproject.org/meta-virtualization"
       rev: "9e040ee8dd6025558ea60ac9db60c41bfeddf221"

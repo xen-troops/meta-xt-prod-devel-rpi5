@@ -196,6 +196,7 @@ components:
         - "tmp/deploy/images/%{MACHINE}/usb-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/pcie1-passthrough.dtbo"
         - "tmp/deploy/images/%{MACHINE}/bcm2712-rpi-5-b.dtb"
+        - "tmp/deploy/images/%{MACHINE}/bcm2712d0.dtbo"
         - "tmp/deploy/images/%{MACHINE}/%{XT_DOMD_IMAGE}-%{MACHINE}.rootfs.ext4"
         - "tmp/deploy/images/%{MACHINE}/Image.gz"
         - "tmp/deploy/images/%{MACHINE}/armstub8-2712.bin"
@@ -291,7 +292,7 @@ images:
           "%{XEN_DT_SCMI_NAME}.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XEN_DT_SCMI_NAME}.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-domd-scmi.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-domd-scmi.dtbo"
           "%{SOC_FAMILY}-%{MACHINE}-pcie1-scmi.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-pcie1-scmi.dtbo"
-          "overlays/bcm2712d0.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/raspberrypi5/bcm2712d0.dtbo"
+          "overlays/bcm2712d0.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bcm2712d0.dtbo"
       dom0:
         gpt_type: ebd0a0a2-b9e5-4433-87c0-68b6b72699c7
         type: vfat

@@ -42,11 +42,11 @@ line option:
 
 ```
 $ moulin rpi5.yaml --help-config
-usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}] [--ENABLE_CAN {yes,no}]
+usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}] [--ENABLE_CAN {mcp2515-can,seeed-can-fd-hat-v2,no}]
 
 Config file description: Raspberry 5 with xen dom0less
 
-optional arguments:
+options:
   --MACHINE {rpi5}      Raspberry Pi machines (default: rpi5)
   --DOMD_ROOT {usb,nvme}
                         Domd root device (default: usb)
@@ -54,15 +54,37 @@ optional arguments:
                         Enable ARM SCMI support (default: no)
   --ENABLE_WIFI {yes,no}
                         Allow wifi in domd (default: no)
-  --ENABLE_CAN {yes,no}
-                        Allow CAN in domd (default: no)
+  --ENABLE_CAN {mcp2515-can,seeed-can-fd-hat-v2,no}
+                        Allow CAN in DomD and choose it type. The naming of options align with the overlay naming used in RPI OS (default: no)
 ```
 
-You can choose root device for the DomD, enable SCMI, WiFi and CAN.
+You can choose root device and CAN for the DomD, enable SCMI, and WiFi.
 
 Moulin will generate `build.ninja` file. After that run `ninja` to
 build the image. This will take some time and disk space as it builds
 a few separate OS images.
+
+##### CAN options
+
+The naming of supported CAN options is chosen to align with the overlay
+naming conventions in RPI OS. Making it easier for users who are already
+familiar with and have experience using supported HATs in RPI OS to
+seamlessly transition to our product.
+
+The required overlay(s) can be easily found in the relevant documentation
+for the specific HAT. For now supported:
+
+- `mcp2515-can` is the option for the **2-CH CAN HAT** with the MCP2515 chip
+  ([documentation](https://www.waveshare.com/wiki/2-CH_CAN_HAT#Documentation)).
+- `seeed-can-fd-hat-v2` is the option for the **2-Channel CAN BUS FD Shield**
+ with the MCP251XFD chip
+  ([documentation](https://wiki.seeedstudio.com/2-Channel-CAN-BUS-FD-Shield-for-Raspberry-Pi/)).
+
+Additionally, note that enabling the `mcp2515-can` option corresponds to
+enabling the mcp2515-can0 and mcp2515-can1 overlays in RPI OS, which
+are not exclusive to the **2-CH CAN HAT**. Therefore, if you are using any
+other CAN HAT with the MCP2515 chip that requires these overlays, it
+may also work.
 
 #### Build products
 

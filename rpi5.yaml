@@ -30,6 +30,8 @@ variables:
 
   DOMU_MACHINE: "generic-armv8-xt"
 
+  DOMD_CAN_TYPE: ""
+
 common_data:
   common_yocto_sources: &COMMON_YOCTO_SOURCES
     - type: git
@@ -170,6 +172,7 @@ components:
         - [KERNEL_IMAGETYPE_UBOOT, "Image"]
         - [DISTRO_FEATURES:append, " xen"]
         - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet"]
+        - [DOMD_CAN_TYPE, "%{DOMD_CAN_TYPE}"]
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
         - *COMMON_YOCTO_LAYERS
@@ -382,23 +385,43 @@ parameters:
       default: true
 
   ENABLE_CAN:
-    desc: "Allow CAN in domd"
-    yes:
+    desc: "Allow CAN in DomD and choose it type. The naming of options align with the overlay naming used in RPI OS"
+    mcp2515-can:
       overrides:
+        variables:
+          DOMD_CAN_TYPE: "mcp2515"
         components:
           domd:
             builder:
               conf:
                 - [MACHINE_FEATURES:append, " domd_can"]
-                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can.dtbo"]
+                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"]
               target_images:
-                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can.dtbo"
-
+                - "tmp/deploy/images/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
         images:
           full:
             partitions:
               boot:
                 items:
-                  "%{SOC_FAMILY}-%{MACHINE}-can.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can.dtbo"
+                  "%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
+
+    seeed-can-fd-hat-v2:
+      overrides:
+        variables:
+          DOMD_CAN_TYPE: "seeed-fd"
+        components:
+          domd:
+            builder:
+              conf:
+                - [MACHINE_FEATURES:append, " domd_can"]
+                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"]
+              target_images:
+                - "tmp/deploy/images/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
+        images:
+          full:
+            partitions:
+              boot:
+                items:
+                  "%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
     no:
       default: true

@@ -374,6 +374,9 @@ parameters:
               conf:
                 - [MACHINE_FEATURES:append, " domd_wifi"]
                 - [LICENSE_FLAGS_ACCEPTED, "synaptics-killswitch"]
+              target_images:
+                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-wifi.dtbo"
+                - "tmp/deploy/images/%{MACHINE}/wifi-passthrough.dtbo"
         images:
           full:
             partitions:
@@ -397,7 +400,7 @@ parameters:
                 - [MACHINE_FEATURES:append, " domd_can"]
                 - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"]
               target_images:
-                - "tmp/deploy/images/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
+                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
         images:
           full:
             partitions:
@@ -416,7 +419,7 @@ parameters:
                 - [MACHINE_FEATURES:append, " domd_can"]
                 - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"]
               target_images:
-                - "tmp/deploy/images/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
+                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
         images:
           full:
             partitions:

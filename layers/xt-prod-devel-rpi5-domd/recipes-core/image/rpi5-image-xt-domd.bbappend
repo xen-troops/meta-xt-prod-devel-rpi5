@@ -15,11 +15,18 @@ CAN_PACKAGES = "			\
     can-utils				\
 "
 
+GFX_PACKAGES = "                       \
+    mesa                                \
+    libdrm                              \
+    kmscube                             \
+"
+
 IMAGE_INSTALL:append = "	\
     optee-test			\
     xen-tools-vchan		\
     ${@bb.utils.contains("MACHINE_FEATURES", "domd_wifi", "${WIFI_PACKAGES}", "" ,d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "domd_can", "${CAN_PACKAGES}", "" ,d)}   \
+    ${@bb.utils.contains("MACHINE_FEATURES", "domd_hdmi", "${GFX_PACKAGES}", "" ,d)} \
 "
 
 # rootfs have to be 8 GiB, expressed in KiB

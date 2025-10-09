@@ -72,7 +72,7 @@ common_data:
     # Remove features that we are not used
     - [DISTRO_FEATURES:remove,
         "x11 gtk gobject-introspection-data nfc irda zeroconf 3g sysvinit
-         acl alsa argp pcmcia usbgadget opengl ptest multiarch wayland
+         acl alsa argp pcmcia usbgadget ptest multiarch wayland
          vulkan sysvinit"]
 
 components:
@@ -439,6 +439,7 @@ parameters:
               conf:
                 - [MACHINE_FEATURES:append, " domd_hdmi"]
                 - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo"]
+                - [DISTRO_FEATURES:append, " opengl"]
               target_images:
                 - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo"
                 - "tmp/deploy/images/%{MACHINE}/hdmi-passthrough.dtbo"

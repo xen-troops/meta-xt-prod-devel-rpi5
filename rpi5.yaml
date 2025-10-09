@@ -171,7 +171,7 @@ components:
         - [UART_BOORLOADER, "1"]
         - [KERNEL_IMAGETYPE_UBOOT, "Image"]
         - [DISTRO_FEATURES:append, " xen"]
-        - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet"]
+        - [DOMD_BOOTARGS, "console=ttyAMA0 earlycon=xen earlyprintk=xen clk_ignore_unused root=%{DOMD_ROOTFS_DEV} rootfstype=ext4 rootwait quiet cma=32M@0x0-1G"]
         - [DOMD_CAN_TYPE, "%{DOMD_CAN_TYPE}"]
       build_target: "%{XT_DOMD_IMAGE}"
       layers:
@@ -426,5 +426,28 @@ parameters:
               boot:
                 items:
                   "%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-can-%{DOMD_CAN_TYPE}.dtbo"
+    no:
+      default: true
+
+  ENABLE_HDMI:
+    desc: "Allow HDMI in DomD"
+    yes:
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [MACHINE_FEATURES:append, " domd_hdmi"]
+                - [DOMD_OVERLAYS:append, " %{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo"]
+              target_images:
+                - "tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo"
+                - "tmp/deploy/images/%{MACHINE}/hdmi-passthrough.dtbo"
+        images:
+          full:
+            partitions:
+              boot:
+                items:
+                  "%{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{SOC_FAMILY}-%{MACHINE}-hdmi.dtbo"
+                  "hdmi-passthrough.dtbo": "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/hdmi-passthrough.dtbo"
     no:
       default: true

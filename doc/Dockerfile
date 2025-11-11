@@ -40,6 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     gawk \
     git \
     git-lfs \
+    gosu \
     gperf \
     liblz4-tool \
     locales \
@@ -72,16 +73,15 @@ COPY --from=sdk_fetcher /zephyr-sdk-${ZEPHYR_SDK_VERSION} /opt/zephyr-sdk-${ZEPH
 WORKDIR /opt/zephyr-sdk-${ZEPHYR_SDK_VERSION}
 RUN ./setup.sh -h
 
-# Create non-root user
-ENV USER_NAME=builder
-RUN groupadd --gid "${USER_GID}" "${USER_NAME}" \
-    && useradd --uid ${USER_ID} --gid ${USER_GID} --create-home --shell /bin/bash ${USER_NAME} \
-    && mkdir -p /home/$USER_NAME/workspace \
-    && chown $USER_NAME:$USER_NAME /home/$USER_NAME/workspace
+# Default runtime identity (can be overridden by -e or build args)
+ENV USER_NAME=builder USER_ID=1000 USER_GID=1000
 
-# Switch the user from root to $USER_NAME (builder)
-USER $USER_NAME
-WORKDIR /home/$USER_NAME/workspace
+# Use a neutral working directory; entrypoint will ensure permissions
+WORKDIR /workspace
 
-# Create dummy ~/.gitconfig
-RUN git config --global user.name "Isolated Builder"  &&  git config --global user.email "builder@example.com"
+# copy a tiny entrypoint
+COPY ./doc/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]

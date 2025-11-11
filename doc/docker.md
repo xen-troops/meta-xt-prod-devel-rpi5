@@ -13,8 +13,12 @@
    docker run --network=host -v $(pwd):/home/builder/workspace -it --rm xtbuilder
    ```
 
-**Note for macOS users:**  
-Bind mounts can cause permission issues with BitBake’s UNIX sockets. To avoid this, run the same container command **without** the `-v` mount and clone the repo inside the container:
+<details>
+<summary><strong>Note for macOS users</strong></summary>
+
+Bind mounts can cause permission issues with BitBake’s UNIX sockets.  
+To avoid this, run the same container command **without** the `-v` mount  
+and clone the repository inside the container:
 
 ```bash
 docker run --network=host -it --rm xtbuilder
@@ -25,8 +29,9 @@ Then inside the container:
 git clone https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git .
 ```
 
-> The container starts in `/home/builder/workspace` (set in the Dockerfile). You can clone directly into the current directory.  
-> Use `docker cp` after the build to copy artifacts out if needed.
-
+> The container starts in `/home/builder/workspace` (set in the Dockerfile).  
+> You can clone directly into the current directory.  
+> Use `docker cp` after the build to copy artifacts out as needed.
+</details>
 
 Once your container is running, continue following the original build manual for the next steps.

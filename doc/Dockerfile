@@ -3,8 +3,18 @@ ARG ZEPHYR_SDK_VERSION=0.16.3
 FROM alpine:latest AS sdk_fetcher
 
 ARG ZEPHYR_SDK_VERSION
-ADD https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz /zephyr-sdk.tar.xz
-RUN tar xf /zephyr-sdk.tar.xz
+ARG TARGETARCH
+
+# Map Docker TARGETARCH to Zephyr SDK archive names, download, and extract
+RUN set -e; \
+    case "${TARGETARCH}" in \
+    amd64)  SDK_ARCH="x86_64" ;; \
+    arm64)  SDK_ARCH="aarch64" ;; \
+    *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac; \
+    apk add --no-cache curl ca-certificates; \
+    curl -fL -o /zephyr-sdk.tar.xz "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-${SDK_ARCH}.tar.xz"; \
+    tar xf /zephyr-sdk.tar.xz
 
 FROM ubuntu:22.04
 

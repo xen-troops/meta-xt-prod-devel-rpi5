@@ -12,8 +12,11 @@ RUN set -e; \
     arm64)  SDK_ARCH="aarch64" ;; \
     *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
     esac; \
-    apk add --no-cache curl ca-certificates; \
-    curl -fL -o /zephyr-sdk.tar.xz "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-${SDK_ARCH}.tar.xz"; \
+    # Use aria2c for faster and more reliable downloads (supports parallel connections, retries, and resume)
+    apk add --no-cache aria2 ca-certificates; \
+    aria2c -c --max-tries=5 -x 8 -s 8 --summary-interval=10 --console-log-level=warn \
+    -o /zephyr-sdk.tar.xz \
+    "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-${SDK_ARCH}.tar.xz"; \
     tar xf /zephyr-sdk.tar.xz
 
 FROM ubuntu:22.04

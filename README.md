@@ -56,9 +56,11 @@ options:
                         Allow wifi in domd (default: no)
   --ENABLE_CAN {mcp2515-can,seeed-can-fd-hat-v2,no}
                         Allow CAN in DomD and choose it type. The naming of options align with the overlay naming used in RPI OS (default: no)
+  --ENABLE_HDMI {yes,no}
+                        Allow HDMI in DomD (default: no)
 ```
 
-You can choose root device and CAN for the DomD, enable SCMI, and WiFi.
+You can choose root device and CAN for the DomD, enable SCMI, HDMI, and WiFi.
 
 Moulin will generate `build.ninja` file. After that run `ninja` to
 build the image. This will take some time and disk space as it builds
@@ -131,6 +133,7 @@ This is release 0.3.1. This release supports the following features:
   * controls hardware;
   * provides PV backends for the domains;
   * supports 2-CH CAN HAT;
+  * supports HMDI;
   * supports WiFi.
 * rpi_5_domd domain
   * zephyr-based domain built on top of zephyr-blinky sample;
@@ -268,9 +271,11 @@ bcm2712-raspberrypi5-usb.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to 
 bcm2712-raspberrypi5-xen.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
 bcm2712-raspberrypi5-pcie1.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable pcie1 in DomD (nvme support)
 bcm2712-raspberrypi5-can.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable CAN in DomD (can support)
+bcm2712-raspberrypi5-hdmi.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable HDMI in DomD (hdmi support)
 mmc-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with mmc support
 usb-passthrough.dtbo //Xen-Troops:Linux DomD Partial DT overlay with USB support
 pcie1-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with pcie1 support (for nvme support)
+hdmi-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with hdmi support
 ```
 
 In `config.txt` the kernel parameter is set to 'kernel=u-boot'
@@ -1108,6 +1113,47 @@ Check the increased amount of TX/RX packets in `ifconfig`:
 (XEN)           collisions:0 txqueuelen:65536
 (XEN)           RX bytes:0 (0.0 B)  TX bytes:4 (4.0 B)
 ```
+
+## Testing HDMI in DomD
+
+**NOTE**: HDMI support requires using the additional parameter `--ENABLE_HDMI yes`
+while generating Ninja build file.
+
+To switch between control domain (`DOM0`) and driver domain console (`DOM1`)
+press "Ctrl + a" 3 times.
+
+**NOTE**: If you use the console which have "Ctrl + a" as the command
+key (for example, minicom), you need to press 6 times instead of 3.
+
+Connect the monitor to the HDMI port on Raspberry Pi board and start
+kmscube program:
+```
+(XEN) root@raspberrypi5-domd:~# kmscube
+(XEN) Using display 0x55566a7655a0 with EGL version 1.4
+(XEN) ===================================
+(XEN) EGL information:
+(XEN)   version: "1.4"
+(XEN)   vendor: "Mesa Project"
+(XEN)   client extensions: "EGL_EXT_client_extensions EGL_EXT_device_base EGL_EXT_device_enumeration EGL_EXT_device_query EGL_EXT_platform_base EGL_KHR_client_get_all_proc_addresses EGL_KHR"
+(XEN)   display extensions: "EGL_ANDROID_blob_cache EGL_ANDROID_native_fence_sync EGL_EXT_buffer_age EGL_EXT_image_dma_buf_import EGL_EXT_image_dma_buf_import_modifiers EGL_KHR_cl_event2 EG"
+(XEN) ===================================
+(XEN) OpenGL ES 2.x information:
+(XEN)   version: "OpenGL ES 3.1 Mesa 24.0.7"
+(XEN)   shading language version: "OpenGL ES GLSL ES 3.10"
+(XEN)   vendor: "Broadcom"
+(XEN)   renderer: "V3D 7.1.7"
+(XEN)   extensions: "GL_EXT_blend_minmax GL_EXT_multi_draw_arrays GL_EXT_texture_filter_anisotropic GL_EXT_texture_compression_s3tc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compressio"
+(XEN) ===================================
+(XEN) Rendered 121 frames in 2.016660 sec (60.000200 fps)
+(XEN) Rendered 242 frames in 4.033326 sec (60.000112 fps)
+(XEN) Rendered 362 frames in 6.033326 sec (60.000070 fps)
+(XEN) Rendered 482 frames in 8.033326 sec (60.000052 fps)
+(XEN) Rendered 602 frames in 10.033327 sec (60.000038 fps)
+(XEN) ^C
+```
+To stop the program press Ctrl+C.
+During execution, a colorful 3D rotating cube should be visible on the
+screen.
 
 ## Bootlog
 

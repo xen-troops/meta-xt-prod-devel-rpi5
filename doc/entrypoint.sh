@@ -22,11 +22,16 @@ else
   useradd -u "${USER_ID}" -g "${USER_GID}" -m -s /bin/bash "${USER_NAME}"
 fi
 
-# Ensure home and workspace directories exist
+# Ensure home and workspace directories exist (simplified)
 HOME_DIR=$(getent passwd "${USER_NAME}" | cut -d: -f6)
 : "${HOME_DIR:=/home/${USER_NAME}}"
+
 mkdir -p "${HOME_DIR}" /workspace "${HOME_DIR}/workspace"
-chown -R "${USER_ID}:${USER_GID}" "${HOME_DIR}" /workspace "${HOME_DIR}/workspace"
+
+# Set directory ownership (non-recursive for speed)
+chown "${USER_ID}:${USER_GID}" "${HOME_DIR}" || true
+chown "${USER_ID}:${USER_GID}" "${HOME_DIR}/workspace" || true
+chown "${USER_ID}:${USER_GID}" /workspace || true
 
 # Set environment for the user
 export HOME="${HOME_DIR}"

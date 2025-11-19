@@ -42,12 +42,14 @@ line option:
 
 ```
 $ moulin rpi5.yaml --help-config
-usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}] [--ENABLE_CAN {mcp2515-can,seeed-can-fd-hat-v2,no}]
+usage: moulin rpi5.yaml [--MACHINE {rpi5}] [--XEN_EARLY {yes,no}] [--DOMD_ROOT {usb,nvme}] [--ENABLE_SCMI {yes,no}] [--ENABLE_WIFI {yes,no}]
+                        [--ENABLE_CAN {mcp2515-can,seeed-can-fd-hat-v2,no}] [--ENABLE_HDMI {yes,no}]
 
 Config file description: Raspberry 5 with xen dom0less
 
 options:
   --MACHINE {rpi5}      Raspberry Pi machines (default: rpi5)
+  --XEN_EARLY {yes,no}  Enable early printk for Xen (default: yes)
   --DOMD_ROOT {usb,nvme}
                         Domd root device (default: usb)
   --ENABLE_SCMI {yes,no}

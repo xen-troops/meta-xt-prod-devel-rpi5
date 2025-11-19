@@ -327,6 +327,19 @@ parameters:
           MACHINE: "raspberrypi5"
           SOC_FAMILY: "bcm2712"
 
+  XEN_EARLY:
+    desc: "Enable early printk for Xen"
+    yes:
+      default: true
+      overrides:
+        components:
+          domd:
+            builder:
+              conf:
+                - [XT_EARLY_PRINTK, "enable"]
+    no:
+      default: false
+
   DOMD_ROOT:
     desc: "Domd root device"
     usb:

@@ -134,9 +134,9 @@ This is release 0.3.1. This release supports the following features:
 * Linux operated driver domain (DomD):
   * controls hardware;
   * provides PV backends for the domains;
-  * supports 2-CH CAN HAT;
+  * supports 2-CH CAN HAT and 2-Channel CAN BUS FD Shield;
   * supports HMDI;
-  * supports WiFi.
+  * supports WiFi [experimental].
 * rpi_5_domd domain
   * zephyr-based domain built on top of zephyr-blinky sample;
   * GPIO device passedthrough to the domain to control onboard LED;
@@ -147,7 +147,7 @@ This is release 0.3.1. This release supports the following features:
 * helloworld_xen-arm64 domain:
   * demonstrates work of unikernel images as a domains.
 * linux_pv_domu domain:
-  * Simple linux-based domain with initramfs
+  * simple linux-based domain with initramfs
   * implements PVnet interface to access other domains via pv network;
   * impelments PVblock interface which allows to mount block devices to the domains.
 * Configuration to use either NVME or USB as a DomD rootfs storage.
@@ -378,6 +378,7 @@ control domain console:
 	xu create rpi_5_domd
 	xu console <domain id>
 ```
+To exit console use `Ctrl-']'`
 
 * rpi_5_domu
 
@@ -385,6 +386,7 @@ control domain console:
 	xu create rpi_5_domu
 	xu console <domain id>
 ```
+To exit console use `Ctrl-']'`
 
 * helloworld_xen-arm64
 
@@ -392,6 +394,7 @@ control domain console:
 	xu create helloworld_xen-arm64
 	xu console <domain id>
 ```
+To exit console use `Ctrl-']'`
 
 * linux_pv_domu
 
@@ -399,6 +402,7 @@ control domain console:
 	xu create linux_pv_domu
 	xu console <domain id>
 ```
+To exit console use `Ctrl-']'`
 
 To switch between control domain and driver domain consoles please press
 "Ctrl + a" 3 times.
@@ -406,12 +410,22 @@ To switch between control domain and driver domain consoles please press
 **NOTE**: If you use the console which have "Ctrl + a" as the command
 key (for example, minicom), you need to press 6 times instead of 3.
 
-Current domain id can be get by using command:
+Current domains id can be get by using command:
 ```
-	xstat stat
+	xu list
 ```
 
-after starting the domain from control domain console.
+That will list all the domains that started from the control domain console. 
+For example, output can be like this:
+```
+uart:~$ xu list
+Name                                        ID   Mem VCPUs      State   Time(s)
+Domain-0                                     0   128     1      r----       3.0
+Dom0less-1                                   1   512     1      -b---       3.1
+rpi_5_domd                                   2    16     1      -b---       0.1
+rpi_5_domu                                   3    16     1      -b---       4.7
+helloworld_xen-arm64                         4    16     1      -b---       0.1
+```
 
 ## Start Zephyr rpi_5_domd domain example
 
@@ -951,75 +965,9 @@ root@generic-armv8-xt-domu:~# ip a
     link/ether 08:00:27:ff:cb:ce brd ff:ff:ff:ff:ff:ff
     inet6 fe80::a00:27ff:feff:cbce/64 scope link
        valid_lft forever preferred_lft forever
+
 root@generic-armv8-xt-domu:~# ip addr add dev enX0 192.168.0.2/24
 ```
-
-Add interfaces to the bridge from driver domain. To switch between control
-domain (`DOM0`) and driver domain console (`DOM1`) press "Ctrl + a"
-3 times.
-
-**NOTE**: If you use the console which have "Ctrl + a" as the command
-key (for example, minicom), you need to press 6 times instead of 3.
-
-```
-root@generic-armv8-xt-domu:~# (XEN) *** Serial input to DOM1 (type 'CTRL-a' three times to switch input)
-
-(XEN) root@raspberrypi5-domd:~#
-```
-
-To check the existing bridges and added interfaces run:
-
-```
-(XEN) root@raspberrypi5-domd:~# brctl show
-(XEN) bridge name       bridge id               STP enabled     interfaces
-(XEN) xenbr0            8000.4642d444db1c       no              eth0
-(XEN)                                                   vif4.0
-```
-
-If you don’t see the bridge with two interfaces, one for ethernet and
-another virtual, like in the example above, than add it using the
-command:
-
-```
-brctl addif <bridge_name> <interface_name>
-```
-
-To find out the names of bridge and interfaces check the output of
-`ip a`:
-```
-(XEN) root@raspberrypi5-domd:~# ip a
-(XEN) 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
-(XEN)     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-(XEN)     inet 127.0.0.1/8 scope host lo
-(XEN)        valid_lft forever preferred_lft forever
-(XEN)     inet6 ::1/128 scope host noprefixroute
-(XEN)        valid_lft forever preferred_lft forever
-(XEN) 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master xenbr0 qlen 1000
-(XEN)     link/ether 2c:cf:67:32:82:7f brd ff:ff:ff:ff:ff:ff
-(XEN)     inet6 fe80::2ecf:67ff:fe32:827f/64 scope link
-(XEN)        valid_lft forever preferred_lft forever
-(XEN) 3: xenbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue qlen 1000
-(XEN)     link/ether 46:42:d4:44:db:1c brd ff:ff:ff:ff:ff:ff
-(XEN)     inet 192.168.11.1/24 brd 192.168.11.255 scope global xenbr0
-(XEN)        valid_lft forever preferred_lft forever
-(XEN)     inet6 fe80::4442:d4ff:fe44:db1c/64 scope link
-(XEN)        valid_lft forever preferred_lft forever
-(XEN) 5: vif4.0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master xenbr0 qlen 1000
-(XEN)     link/ether fe:ff:ff:ff:ff:ff brd ff:ff:ff:ff:ff:ff
-(XEN)     inet6 fe80::fcff:ffff:feff:ffff/64 scope link
-(XEN)        valid_lft forever preferred_lft forever
-```
-
-In these example:
-```
-(XEN) root@raspberrypi5-domd:~# brctl addif xenbr0 eth0
-(XEN) root@raspberrypi5-domd:~# brctl addif xenbr0 vif8.0
-```
-Switch to the control domain with **linux_pv_domu** console by pressing
-"Ctrl + a" 3 times twice.
-
-**NOTE**: If you use the console which have "Ctrl + a" as the command
-key (for example, minicom), you need to press 6 times instead of 3.
 
 To test connection run the following command:
 ```
@@ -1052,7 +1000,7 @@ domain:4 destroyed
 
 ## Testing CAN loopback in DomD
 
-**NOTE**: CAN support requires using the additional parameter `--ENABLE_CAN yes`
+**NOTE**: CAN support requires using the additional parameter `--ENABLE_CAN <can_type>`
 while generating Ninja build file.
 
 To switch between control domain (`DOM0`) and driver domain console (`DOM1`)

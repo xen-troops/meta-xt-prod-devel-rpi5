@@ -131,7 +131,7 @@ Build for the driver domain device is based on RPI5 bsp Yocto build:
 
 ## Status
 
-This is release 0.3.1. This release supports the following features:
+This is release 0.4.0. This release supports the following features:
 
 * Zephyr-operated control domain:
   * xen libraries integration that allows control of the other domains.
@@ -1481,11 +1481,15 @@ uart:~$
 The following section lists features that have already been implemented and
 plans for the future releases:
 
-### Features implemented in Release v0.3
+### Features implemented in Release v0.4
 
- * Add CAN support to DomD
- * Fix console for Raspberry PI 5 1.1 revision boards
- * Reorganize the build
+ * Add CAN support for both HATs
+ * Add support for Docker image
+ * Upgrade the DomD RPi Linux to the 6.12 version
+ * Add HDMI support
+ * Add the parameter to enable early printk in Xen
+ * Add missed target/rules in yaml
+ * Improve and update README.md
 
 ### TODO
 
@@ -1536,3 +1540,10 @@ ninja
 |        |           | - fix console for rpi5 1.1 rev boards             |
 |        |           | - reorganize the build                            |
 | v0.3.1 | 08/13/2025| add release tag for meta-xt-common                |
+| v0.4.0 | 01/03/2025| - add CAN support for both HATs                   |
+|        |           | - add support for Docker image                    |
+|        |           | - upgrade the DomD RPi Linux to the 6.12 version  |
+|        |           | - add HDMI support                                |
+|        |           | - add the parameter to enable early printk in Xen |
+|        |           | - add missed target/rules in yaml                 |
+|        |           | - improve and update README.md                    |

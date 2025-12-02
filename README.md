@@ -1,43 +1,49 @@
 # meta-xt-prod-devel-rpi5
 
-The Xen-Troops RPI 5 Xen demonstration project is intended to demonstrate how RPI 5 can be used
-to run Xen, which includes the following images:
+The Xen-Troops RPI 5 Xen demonstration project is intended to demonstrate how
+RPI 5 can be used to run Xen, which includes the following images:
 
-* Zephyr-operated control domain, which is a thin Zephyr Dom0 `zephyr-dom0-xt` application
-  with shell and SD-card storage support (SDHC). It also supports dom0less functionality.
-  This domain is responsible for Xen domains control.
-  It includes xen-tools library, which gives the ability to control other domains.
-* Linux-operated driver domain. This domain manages hardware and provides access to
-  some of this hardware to other domains using PV backends. It has access to USB and rootfs,
-  which is placed on USB storage.
+* Zephyr-operated control domain, which is a thin Zephyr Dom0
+  `zephyr-dom0-xt` application with shell and SD-card storage support (SDHC).
+  It also supports dom0less functionality.
+  This domain is responsible for Xen domains control. 
+  It includes xen-tools library, which gives the ability to control other
+  domains.
+* Linux-operated driver domain. This domain manages hardware and provides
+  access to some of this hardware to other domains using PV backends. It has
+  access to USB and rootfs, which is placed on USB storage.
 * A set of domains to be started from the control domain.
 * NVME storage support as DomD rootfs.
 
 Once the Zephyr control domain is booted, it can start other guest domains.
 
-The Zephyr Dom0 `zephyr-dom0-xt` provides the following guest domain configurations:
+The Zephyr Dom0 `zephyr-dom0-xt` provides the following guest domain
+configurations:
 
-- **rpi_5_domd**: The Xen guest domain configuration which uses real RPI5 GPIO HW
-  ``/soc/gpio@7d517c00``. It is based on the Zephyr Blinky sample.
-- **rpi_5_domu**: The Xen guest domain configuration that starts the Xen guest domain without
-  using real RPI5 HW. It's based on Zephyr samples/synchronization sample.
-- **helloworld_xen-arm64**: The Xen guest domain configuration that does not use real RPI5 HW and starts a Unikraft kernel. It is based on "Unikraft helloworld" and "monkey" examples.
-- **linux_pv_domu**: The Linux-based Xen guest domain with initramfs and PV network support.
+- **rpi_5_domd**: The Xen guest domain configuration which uses real RPI5 GPIO
+  HW `/soc/gpio@7d517c00`. It is based on the Zephyr Blinky sample.
+- **rpi_5_domu**: The Xen guest domain configuration that starts the Xen guest
+  domain without using real RPI5 HW. It's based on Zephyr
+  samples/synchronization sample.
+- **helloworld_xen-arm64**: The Xen guest domain configuration that does not
+  use real RPI5 HW and starts a Unikraft kernel. It is based on "Unikraft
+  helloworld" and "monkey" examples.
+- **linux_pv_domu**: The Linux-based Xen guest domain with initramfs and PV
+  network support.
 
 #### Fetching
 
-You can clone this whole repository, or download it as an archive.
-During the build, a few directories will be created, and additional
-dependencies will be fetched into them.
+You can clone this whole repository, or download it as an archive. During
+the build, a few directories will be created, and additional dependencies
+will be fetched into them.
 The build system will create a build directory `yocto/` for Yocto's
 meta-layers, and `zephyr/` for the Dom0 with Zephyr OS.
 
 #### Building
 
-Moulin is used to generate Ninja build file: `moulin
-rpi5.yaml`. This project provides a number of additional
-parameters. You can check them with the `--help-config` command
-line option:
+Moulin is used to generate Ninja build file: `moulin rpi5.yaml`.
+This project provides a number of additional parameters. You can check them
+with the `--help-config` command line option:
 
 ```
 $ moulin rpi5.yaml --help-config
@@ -63,31 +69,30 @@ options:
 
 You can choose root device and CAN for the DomD, enable SCMI, HDMI, and WiFi.
 
-Moulin will generate a `build.ninja` file. After that, run `ninja` to
-build the image. This will take some time and disk space as it builds
-a few separate OS images.
+Moulin will generate a `build.ninja` file. After that, run `ninja` to build the
+image. This will take some time and disk space as it builds a few separate OS
+images.
 
 ##### CAN options
 
-The naming of supported CAN options was chosen to align with the overlay
-naming conventions in RPI OS, making it easier for users who are already
-familiar with and have experience using supported HATs in RPI OS to
-seamlessly transition to our product.
+The naming of supported CAN options was chosen to align with the overlay naming
+conventions in RPI OS, making it easier for users who are already familiar with
+and have experience using supported HATs in RPI OS to seamlessly transition to
+our product.
 
-The required overlay(s) can be easily found in the relevant documentation
-for the specific HAT. For now, supported options are:
+The required overlay(s) can be easily found in the relevant documentation for the
+specific HAT. For now, supported options are:
 
 - `mcp2515-can` is the option for the **2-CH CAN HAT** with the MCP2515 chip
   ([documentation](https://www.waveshare.com/wiki/2-CH_CAN_HAT#Documentation)).
 - `seeed-can-fd-hat-v2` is the option for the **2-Channel CAN BUS FD Shield**
- with the MCP251XFD chip
+  with the MCP251XFD chip
   ([documentation](https://wiki.seeedstudio.com/2-Channel-CAN-BUS-FD-Shield-for-Raspberry-Pi/)).
 
-Additionally, note that enabling the `mcp2515-can` option corresponds to
-enabling the mcp2515-can0 and mcp2515-can1 overlays in RPI OS, which
-are not exclusive to the **2-CH CAN HAT**. Therefore, if you are using any
-other CAN HAT with the MCP2515 chip that requires these overlays, it
-may also work.
+Additionally, note that enabling the `mcp2515-can` option corresponds to enabling
+the mcp2515-can0 and mcp2515-can1 overlays in RPI OS, which are not exclusive to
+the **2-CH CAN HAT**. Therefore, if you are using any other CAN HAT with the
+MCP2515 chip that requires these overlays, it may also work.
 
 #### Build products
 
@@ -116,7 +121,8 @@ After `ninja full.img`:
   * loads **RPI 5 Linux DomU** binary for DomU0
   * loads **Xen Passthrough device tree** binary for DomU0
   * loads **Linux System device tree device tree** binary
-  * applies changes to **Linux System device tree device tree** for Xen `dom0less` boot mode
+  * applies changes to **Linux System device tree device tree** for Xen `dom0less`
+  boot mode
   * loads **Xen** binary and starts **Xen**
 * **Xen** is booted and starts **Zephyr Dom0 zephyr-dom0-xt** and RPI 5 Linux DomU0
 
@@ -148,7 +154,8 @@ This is release 0.3.1. This release supports the following features:
 * linux_pv_domu domain:
   * simple Linux-based domain with initramfs
   * implements PVnet interface to access other domains via PV network;
-  * implements PVblock interface, which allows mounting block devices to the domains.
+  * implements PVblock interface, which allows mounting block devices to the
+    domains.
 * Configuration to use either NVME or USB as a DomD rootfs storage.
 
 Testing pvnet connection instruction:
@@ -156,7 +163,8 @@ Testing pvnet connection instruction:
 
 ## System Requirements
 
-The following dependencies must be satisfied before starting to build the project:
+The following dependencies must be satisfied before starting to build the
+project:
 
 [Moulin requirements](https://moulin.readthedocs.io/en/latest/about.html#requirements-and-installation)
 
@@ -166,14 +174,14 @@ The following dependencies must be satisfied before starting to build the projec
 
 ## Build
 
-You can clone the entire repository or download it as an archive. During
-the build process, several directories will be created and additional dependencies
+You can clone the entire repository or download it as an archive. During the
+build process, several directories will be created and additional dependencies
 will be fetched into them.
 
-**NOTE:** Please ensure that your storage devices do not use ``ecryptfs`` or other
-file systems that impose filename length limitations. Yocto requires a
-file system that supports long filenames. Failure to meet this
-requirement will result in an error during the build process.
+**NOTE:** Please ensure that your storage devices do not use `ecryptfs` or
+other file systems that impose filename length limitations. Yocto requires a
+file system that supports long filenames. Failure to meet this requirement will
+result in an error during the build process.
 
 To start the build, run:
 
@@ -185,7 +193,8 @@ ninja
 
 The build process generates two images:
 
-* An SD-card image, used for boot and by the Zephyr Dom0 `zephyr-dom0-xt` application;
+* An SD-card image, used for boot and by the Zephyr Dom0 `zephyr-dom0-xt`
+  application;
 * A USB-flash image, used as the **rootfs** by the Linux-operated driver domain.
 
 To build the system with the DomD rootfs on NVMe storage, run:
@@ -217,24 +226,28 @@ sudo dd if=./full.img of=/dev/<sd-dev> bs=4M status=progress
 
 ```
 
-**NOTE:** Be sure to identify correctly <sd-dev>, which is usually "sda". For SD-card identification,
-plug/unplug the SD-card and check `/dev/` for devices that have been added/removed.
+**NOTE:** Be sure to identify correctly <sd-dev>, which is usually "sda". For
+SD-card identification, plug/unplug the SD-card and check `/dev/` for devices
+that have been added/removed.
 
-**NOTE:** Ensure any existing SD-card partitions are unmounted if auto-mount is enabled.
+**NOTE:** Ensure any existing SD-card partitions are unmounted if auto-mount is
+enabled.
 
 ### SD-card Image Content
 
-The SD-card image **full.img** is created using GPT format and contains two FATFS partitions:
+The SD-card image **full.img** is created using GPT format and contains two
+FATFS partitions:
 
-* First: 512 MB bootfs partition, containing files required for the RPI5 to boot.
-* Second: 512 MB dom0 partition, used exclusively by the Zephyr Dom0 `zephyr-dom0-xt` application
-  and containing guest domain images.
+* First: 512 MB bootfs partition, containing files required for the RPI5 to
+  boot.
+* Second: 512 MB dom0 partition, used exclusively by the Zephyr Dom0
+  `zephyr-dom0-xt` application and containing guest domain images.
 
 #### bootfs Partition Content
 
-The bootfs partition contains the following files. Generic RPI 5 files are marked as **"RPI5"**.
-The Xen-Troops RPI 5 Xen demonstration project files (or modified files)
-are marked as **"Xen-Troops:"**:
+The bootfs partition contains the following files. Generic RPI 5 files are
+marked as **"RPI5"**. The Xen-Troops RPI 5 Xen demonstration project files (or
+modified files) are marked as **"Xen-Troops:"**:
 
 ```
 bcm2712-rpi-5-b.dtb //RPI5
@@ -267,24 +280,33 @@ zephyr.bin //Xen-Troops: Zephyr Dom0 `zephyr-dom0-xt` application
 Image.gz // Xen-Troops: RPI5 Linux DomD kernel with Xen support enabled
 armstub8-2712.bin   //Xen-Troops: OPTEE
 bcm2712-raspberrypi5-domd.dtb //Xen-Troops: Linux DomD Partial DT
-bcm2712-raspberrypi5-mmc.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable mmc in DomD
-bcm2712-raspberrypi5-usb.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable USB in DomD
+bcm2712-raspberrypi5-mmc.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to
+  enable mmc in DomD
+bcm2712-raspberrypi5-usb.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to
+  enable USB in DomD
 bcm2712-raspberrypi5-xen.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
-bcm2712-raspberrypi5-pcie1.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable pcie1 in DomD (nvme support)
-bcm2712-raspberrypi5-can.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable CAN in DomD (can support)
-bcm2712-raspberrypi5-hdmi.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT to enable HDMI in DomD (hdmi support)
-mmc-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with mmc support
-usb-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with USB support
-pcie1-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with pcie1 support (for nvme support)
-hdmi-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with hdmi support
+bcm2712-raspberrypi5-pcie1.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
+  to enable pcie1 in DomD (nvme support)
+bcm2712-raspberrypi5-can.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
+  to enable CAN in DomD (can support)
+bcm2712-raspberrypi5-hdmi.dtbo //Xen-Troops: Xen overlay for System (RPI5) DT
+  to enable HDMI in DomD (hdmi support)
+mmc-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with mmc
+  support
+usb-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with USB
+  support
+pcie1-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with pcie1
+  support (for nvme support)
+hdmi-passthrough.dtbo //Xen-Troops: Linux DomD Partial DT overlay with hdmi
+  support
 ```
 
 In `config.txt`, the kernel parameter is set to 'kernel=u-boot'.
 
 #### dom0 Partition Content
 
-The dom0 partition is used exclusively by the Zephyr Dom0 `zephyr-dom0-xt` application
-and contains guest domains images:
+The dom0 partition is used exclusively by the Zephyr Dom0 `zephyr-dom0-xt`
+application and contains guest domains images:
 
 rpi_5_domd
 rpi_5_domu
@@ -292,10 +314,14 @@ helloworld_xen-arm64
 linux_pv_domu
 
 ```
-dom0/z_sync.bin //Xen-Troops: kernel image for **rpi_5_domu** guest domain configuration
-dom0/z_blinky.bin //Xen-Troops: kernel image for **rpi_5_domd** guest domain configuration
-dom0/helloworld_xen-arm64 //Xen-Troops: kernel image for **helloworld_xen-arm64** guest domain configuration
-dom0/liunx-pv-image //Xen-Troops: kernel image for **linux_pv_domu** guest domain configuration
+dom0/z_sync.bin //Xen-Troops: kernel image for **rpi_5_domu** guest domain
+  configuration
+dom0/z_blinky.bin //Xen-Troops: kernel image for **rpi_5_domd** guest domain
+  configuration
+dom0/helloworld_xen-arm64 //Xen-Troops: kernel image for **helloworld_xen-arm64**
+  guest domain configuration
+dom0/liunx-pv-image //Xen-Troops: kernel image for **linux_pv_domu** guest
+  domain configuration
 ```
 
 ## Create DomD rootfs Image
@@ -317,12 +343,14 @@ sudo dd if=./rootfs.img of=/dev/<usb-dev> bs=4M status=progress
 ```
 
 **NOTE:** Be sure to identify correctly <usb-dev>, which could look like "sdc".
-For USB-flash identification, plug/unplug the USB-flash and check `/dev/` for devices that have been added/removed.
+For USB-flash identification, plug/unplug the USB-flash and check `/dev/` for
+devices that have been added/removed.
 
-**NOTE:** Ensure any existing SD-card partitions are unmounted if auto-mount is enabled.
+**NOTE:** Ensure any existing SD-card partitions are unmounted if auto-mount is
+enabled.
 
-Alternatively, you can use the generated **"ext4"** image to flash to the USB-flash, which can be found in
-the relative build directory:
+Alternatively, you can use the generated **"ext4"** image to flash to the
+USB-flash, which can be found in the relative build directory:
 
 ```
 yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4
@@ -334,20 +362,23 @@ To flash the **"ext4"** image, run:
 dd if=yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 of=<usb-dev> bs=1M
 ```
 
-**NOTE:** In case of **"ext4"** image usage, the media should be properly partitioned,
-(e.g., using `fdisk`), before writing the image.
+**NOTE:** In case of **"ext4"** image usage, the media should be properly
+partitioned, (e.g., using `fdisk`), before writing the image.
 
 #### USB-flash Image Content
 
-The USB flash image contains the RPI 5 Linux rootfs based on RPI5 bsp yocto build
-[meta-raspberrypi](https://git.yoctoproject.org/meta-raspberrypi) with Xen tools enabled.
+The USB flash image contains the RPI 5 Linux rootfs based on RPI5 bsp yocto
+build [meta-raspberrypi](https://git.yoctoproject.org/meta-raspberrypi) with Xen
+tools enabled.
 
 ### Flash rootfs Image to the NVMe Storage
 
 * Create an SD-card with the official Ubuntu from the Raspberry Pi Foundation.
 * Copy the file `yocto/build-domd/tmp/deploy/images/raspberrypi5/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4` to the USB-Flash dongle.
-* Boot from the SD-card with Ubuntu. Plug the USB-Flash dongle into the Raspberry Pi board.
-* Create a partition on the NVMe storage by running the following command (as root):
+* Boot from the SD-card with Ubuntu. Plug the USB-Flash dongle into the
+  Raspberry Pi board.
+* Create a partition on the NVMe storage by running the following command (as
+  root):
 ```
 (
 echo o
@@ -369,8 +400,8 @@ dd if=<usb-dev>/rpi5-image-xt-domd-raspberrypi5.rootfs.ext4 of=/dev/nvme0n1p1 bs
 
 This section describes how to start domains:
 
-To start domains, please execute the following commands from
-the control domain console:
+To start domains, please execute the following commands from the control domain
+console:
 
 * rpi_5_domd
 ```
@@ -406,16 +437,16 @@ To exit the console, use `Ctrl-']'`
 To switch between the control domain and driver domain consoles, please press
 "Ctrl + a" 3 times.
 
-**NOTE**: If you use a console program, which have "Ctrl + a" as a command
-key (such as, minicom), you need to press 6 times instead of 3.
+**NOTE**: If you use a console program, which have "Ctrl + a" as a command key
+(such as, minicom), you need to press 6 times instead of 3.
 
 Current domains IDs could be get by running the following command:
 ```
 	xu list
 ```
 
-This will list all the domains that were started from the control domain console.
-For example, the output might look like this:
+This will list all the domains that were started from the control domain
+console. For example, the output might look like this:
 ```
 uart:~$ xu list
 Name                                        ID   Mem VCPUs      State   Time(s)
@@ -428,13 +459,13 @@ helloworld_xen-arm64                         4    16     1      -b---       0.1
 
 ## Start Zephyr rpi_5_domd Domain Example
 
-The **rpi_5_domd**  mockups Driver Domain (DomD) behavior and uses real
-RPI5 GPIO hardware at ``/soc/gpio@7d517c00``. It is based on the Zephyr Blinky sample.
+The **rpi_5_domd**  mockups Driver Domain (DomD) behavior and uses real RPI5 GPIO
+hardware at `/soc/gpio@7d517c00`. It is based on the Zephyr Blinky sample.
 
-Create the DomD by running ``xu create`` with the **rpi_5_domd** configuration.
+Create the DomD by running `xu create` with the **rpi_5_domd** configuration.
 
-**NOTE**: Look for a line similar to  **"domain:2 created"** to obtain the Xen domain ID, which will be used as input
-to all subsequent commands.
+**NOTE**: Look for a line similar to  **"domain:2 created"** to obtain the Xen domain
+ID, which will be used as input to all subsequent commands.
 
 ```
 uart:~$ xu config_list
@@ -489,7 +520,7 @@ uart:~$ (XEN) d2v0: vGICD: unhandled word write 0x000000ffffffff to ICACTIVER0
 
 At this moment RPI5 led should start blinking.
 
-Attach to DomD console with ``xu console``, use ``Ctrl-']'`` to exit console:
+Attach to DomD console with `xu console`, use `Ctrl-']'` to exit console:
 
 ```
 uart:~$ xu console 2
@@ -516,7 +547,8 @@ LED state: ON
 Detached from console
 ```
 
-Pause DomD - RPI5 led should stop blinking and console should produce no new messages:
+Pause DomD - RPI5 led should stop blinking and console should produce no new
+messages:
 
 ```
 uart:~$ xu pause 2
@@ -541,7 +573,8 @@ uart:~$ xu unpause 2
 domain:2 unpaused
 ```
 
-Destroy DomD - after destroying the Xen domain, ID "2" will no longer be accessible.
+Destroy DomD - after destroying the Xen domain, ID "2" will no longer be
+accessible.
 
 ```
 uart:~$ xu destroy 2
@@ -550,13 +583,13 @@ domain:2 destroyed
 
 ## Start Zephyr rpi_5_domu domain example
 
-The **rpi_5_domu** mockups simple Xen guest domain (DomU) without using real RPI5 HW.
-It's based on Zephyr samples/synchronization sample.
+The **rpi_5_domu** mockups simple Xen guest domain (DomU) without using real RPI5
+HW. It's based on Zephyr samples/synchronization sample.
 
-Create DomU by using ``xu create`` with **rpi_5_domu**.
+Create DomU by using `xu create` with **rpi_5_domu**.
 
-**NOTE**: Look for a line similar to **"domain:3 created"** to obtain the Xen domain ID, which will be used as input
-to all subsequent commands.
+**NOTE**: Look for a line similar to **"domain:3 created"** to obtain the Xen domain
+ID, which will be used as input to all subsequent commands.
 
 ```
 uart:~$ xu create rpi_5_domu
@@ -590,7 +623,7 @@ uart:~$ (XEN) d3v0: vGICD: unhandled word write 0x000000ffffffff to ICACTIVER0
 (XEN) xen-source/xen/common/grant_table.c:1909:d3v0 Expanding d3 grant table from 15 to 16 frames
 ```
 
-Attach to DomU console with ``xu console``, use ``Ctrl-']'`` to exit console:
+Attach to DomU console with `xu console`, use `Ctrl-']'` to exit console:
 
 ```
 uart:~$ xu console 3
@@ -617,7 +650,8 @@ thread_b: Hello World from cpu 0 on xenvm!
 Detached from console
 ```
 
-Destroy domain - after destroying the DomU Xen domain, ID "3" will no longer be accessible.
+Destroy domain - after destroying the DomU Xen domain, ID "3" will no
+longer be accessible.
 
 ```
 uart:~$ xu destroy 3
@@ -626,13 +660,14 @@ domain:3 destroyed
 
 ## Start Unikraft helloworld_xen-arm64 Domain Example
 
-The **helloworld_xen-arm64** is Xen guest domain (DomU Unikraft) that does not use real RPI5 hardware.
-It is based on the "Unikraft helloworld" and "monkey" examples.
+The **helloworld_xen-arm64** is Xen guest domain (DomU Unikraft) that does not use
+real RPI5 hardware. It is based on the "Unikraft helloworld" and "monkey"
+examples.
 
-Create the Unikraft DomU by using ``xu create`` with **helloworld_xen-arm64**.
+Create the Unikraft DomU by using `xu create` with **helloworld_xen-arm64**.
 
-**NOTE**: Look for a line similar to **"domain:4 created"** to obtain the Xen domain ID,
-which will be used as input for all subsequent commands.
+**NOTE**: Look for a line similar to **"domain:4 created"** to obtain the Xen
+domain ID, which will be used as input for all subsequent commands.
 
 ```
 uart:~$ xu config_list
@@ -666,8 +701,8 @@ uart:~$ (XEN) xen-source/xen/common/grant_table.c:1909:d4v0 Expanding d4 grant t
 (XEN) xen-source/xen/common/grant_table.c:1909:d4v0 Expanding d4 grant table from 3 to 4 frames
 ```
 
-Attach to the Unikraft DomU console with ``xu console <domid>``. Use ``Ctrl-']'`` to exit the console.
-There should be seen a moving monkey:
+Attach to the Unikraft DomU console with `xu console <domid>`. Use `Ctrl-']'`
+to exit the console. There should be seen a moving monkey:
 
 ```
 uart:~$ xu console 4
@@ -788,7 +823,8 @@ Arguments:  "helloworld"
 Detached from console
 ```
 
-Destroy domain - after destroying the DomU Unikraft Xen domain, ID "4" will no longer be accessible.
+Destroy domain - after destroying the DomU Unikraft Xen domain, ID "4" will no
+longer be accessible.
 
 ```
 uart:~$ xu destroy 4
@@ -797,15 +833,16 @@ domain:4 destroyed
 
 ## Start Linux linux_pv_domu Domain Example
 
-The **linux_pv_domu** is Xen guest domain (Linux minimal) that demonstrates connection of
-the PVnet and PVblock device
+The **linux_pv_domu** is Xen guest domain (Linux minimal) that demonstrates
+connection of the PVnet and PVblock device.
 
-Create the Linux guest domain by running ``xu create`` with **linux_pv_domu**.
+Create the Linux guest domain by running `xu create` with **linux_pv_domu**.
 
-**NOTE**: Look for a line similar to **"domain:5 created"** to obtain the Xen domain ID,
-which will be used as input for all subsequent commands.
+**NOTE**: Look for a line similar to **"domain:5 created"** to obtain the Xen domain
+ID, which will be used as input for all subsequent commands.
 
-Attach to the linux_pv_domu console with ``xu console <domid>``. Use ``Ctrl-']'`` to exit the console.
+Attach to the linux_pv_domu console with `xu console <domid>`. Use `Ctrl-']'`
+to exit the console.
 There should be seen Linux boot log:
 
 ```
@@ -941,8 +978,8 @@ own distribution for production use.
 -  Set a static IP address for the Ethernet interface on your PC (in this
    example will be used `192.168.0.1/24`)
 
-Set an IP address to the network interface inside the **linux_pv_domu** domain
-by executing the following commands:
+Set an IP address to the network interface inside the **linux_pv_domu** domain by
+executing the following commands:
 ```
 ip a
 ip addr add dev enX0 192.168.0.2/24
@@ -987,7 +1024,8 @@ root@generic-armv8-xt-domu:~# ^C
 Also, the **/dev/xvda** device should be present, indicating that PVblock is
 attached.
 
-Destroy domain - after destroying the Linux Xen domain, ID "5" will no longer be accessible.
+Destroy domain - after destroying the Linux Xen domain, ID "5" will no longer
+be accessible.
 
 ```
 uart:~$ xu destroy 5
@@ -996,14 +1034,14 @@ domain:5 destroyed
 
 ## Testing CAN Loopback in DomD
 
-**NOTE**: CAN support requires using the additional parameter `--ENABLE_CAN <can_type>`
-when generating the Ninja build file.
+**NOTE**: CAN support requires using the additional parameter
+`--ENABLE_CAN <can_type>` when generating the Ninja build file.
 
-To switch between the control domain (`DOM0`) and the driver domain console (`DOM1`),
-press "Ctrl + a" 3 times.
+To switch between the control domain (`DOM0`) and the driver domain console
+(`DOM1`), press "Ctrl + a" 3 times.
 
-**NOTE**: If you use the console which have "Ctrl + a" as the command
-key (such as, minicom), you need to press 6 times instead of 3.
+**NOTE**: If you use the console which have "Ctrl + a" as the command key
+(such as, minicom), you need to press 6 times instead of 3.
 
 Check that the CAN interfaces are initialized successfully:
 ```
@@ -1026,7 +1064,8 @@ Connect CAN0_H to CAN1_L and CAN1_H to CAN0_L on the 2-CH CAN HAT.
 
 Using `ifconfig` fix down the amount of RX/TX packets on each CAN interface.
 
-Start receiving messages from `can0` in the background with redirecting the output to a file:
+Start receiving messages from `can0` in the background with redirecting the
+output to a file:
 ```
 candump can0 >> can0.txt &
 ```
@@ -1034,8 +1073,8 @@ Send some data from `can1`:
 ```
 cansend can1 000#11.22.33.44
 ```
-Use `fg` and "Ctrl + c" to bring the background process to the foreground
-and terminate it.
+Use `fg` and "Ctrl + c" to bring the background process to the foreground and
+terminate it.
 
 Check the contents of the file `can0.txt`:
 ```
@@ -1062,17 +1101,17 @@ Check the increased amount of TX/RX packets in `ifconfig`:
 
 ## Testing HDMI in DomD
 
-**NOTE**: HDMI support requires using the additional parameter `--ENABLE_HDMI yes`
-when generating the Ninja build file.
+**NOTE**: HDMI support requires using the additional parameter
+`--ENABLE_HDMI yes` when generating the Ninja build file.
 
-To switch between the control domain (`DOM0`) and the driver domain console (`DOM1`),
-press "Ctrl + a" 3 times.
+To switch between the control domain (`DOM0`) and the driver domain console
+(`DOM1`), press "Ctrl + a" 3 times.
 
-**NOTE**: If you use the console which have "Ctrl + a" as the command
-key (such as, minicom), you need to press 6 times instead of 3.
+**NOTE**: If you use the console which have "Ctrl + a" as the command key
+(such as, minicom), you need to press 6 times instead of 3.
 
-Connect a monitor to the HDMI port on your Raspberry Pi board and start
-the kmscube program:
+Connect a monitor to the HDMI port on your Raspberry Pi board and start the
+kmscube program:
 ```
 (XEN) root@raspberrypi5-domd:~# kmscube
 (XEN) Using display 0x55566a7655a0 with EGL version 1.4
@@ -1097,9 +1136,8 @@ the kmscube program:
 (XEN) Rendered 602 frames in 10.033327 sec (60.000038 fps)
 (XEN) ^C
 ```
-To stop the program, press Ctrl+C.
-During execution, a colorful, 3D rotating cube should be visible on the
-screen.
+To stop the program, press `Ctrl + C`.
+During execution, a colorful, 3D rotating cube should be visible on the screen.
 
 ## Bootlog
 
@@ -1440,7 +1478,8 @@ uart:~$
 
 ## Features and Tasks
 
-The following section lists features that have already been implemented and plans for the future releases:
+The following section lists features that have already been implemented and
+plans for the future releases:
 
 ### Features implemented in Release v0.3
 
@@ -1453,9 +1492,11 @@ The following section lists features that have already been implemented and plan
  * Enable the SCMI server in ARM-TF and port the reset and pinctrl drivers;
  * Implement the pinctrl-scmi protocol server in ARM-TF;
  * Implementation of the SCMI support in Zephyr for reset;
- * Integration of the SCMI Mediator support in Xen, allowing different domains to access resources;
+ * Integration of the SCMI Mediator support in Xen, allowing different domains
+   to access resources;
  * Add SCMI-Agent permissions support to ARM-TF and the Xen SCMI Mediator;
- * Backport the pinctrl-scmi driver from master to the Raspberry PI 5 Linux kernel;
+ * Backport the pinctrl-scmi driver from master to the Raspberry PI 5 Linux
+   kernel;
  * Configure the Linux kernel (in DomD) to use set resets and pinctrl;
  * Ddd WLAN support to DomD. This requires SCMI to share pinctrl access.
 
@@ -1464,8 +1505,10 @@ Link to the wiki pages:
 [wiki](https://github.com/xen-troops/meta-xt-rpi5/wiki)
 
 ## Known Issues
-1. Sometimes, RPi boot firmware files are not deployed during the build. In this case, rpi-bootfiles, rpi-config and
-rpi-cmdline recipes should be cleaned using the Yocto command:
+1. Sometimes, RPi boot firmware files are not deployed during the build. In
+this case, rpi-bootfiles, rpi-config and rpi-cmdline recipes should be cleaned
+using the Yocto command:
+
 ```
 cd yocto
 . poky/oe-init-build-env build-domd

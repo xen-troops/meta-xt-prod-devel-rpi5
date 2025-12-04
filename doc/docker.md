@@ -1,27 +1,37 @@
-## How to install and use Docker for building
+## Using Docker to Build the Project
 
-Install Docker according to the following manuals:
+1. Install Docker by following the official guide:  
+   https://docs.docker.com/engine/install/
 
-https://docs.docker.com/engine/install/ubuntu/
+2. Build the Docker image:  
+   ```
+   docker build -f doc/Dockerfile --build-arg USER_ID="$(id -u)" --build-arg USER_GID="$(id -g)" -t xtbuilder .
+   ```
 
-https://docs.docker.com/engine/install/linux-postinstall/
+3. Run the container on Linux or macOS (with mount):  
+   ```
+   docker run --network=host -v $(pwd):/home/builder/workspace -it --rm xtbuilder
+   ```
 
-Pay attention to the section "Manage Docker as a non-root user", as it is critical
-for the proper usage of the container.
+<details>
+<summary><strong>Note for macOS users</strong></summary>
 
-We assume that you have already cloned the repo with sources and the `doc/` folder,
-which contains `Dockerfile`.
+Bind mounts can cause permission issues with BitBake’s UNIX sockets.  
+To avoid this, run the same container command **without** the `-v` mount  
+and clone the repository inside the container:
 
-Build Docker image using:
-
+```bash
+docker run --network=host -it --rm xtbuilder
 ```
-docker build . -f doc/Dockerfile --build-arg USER_ID="$(id -u)" --build-arg USER_GID="$(id -g)" -t xtbuilder
-```
-if your user has uid/gid equal 1000 you may omit `--build-arg` parameters.
 
-Run Docker image
-```
-docker run --network=host -v <directory with rpi5.yaml>:/home/builder/workspace -it --rm xtbuilder
+Then inside the container:
+```bash
+git clone https://github.com/xen-troops/meta-xt-prod-devel-rpi5.git .
 ```
 
-Please go ahead with the original build manual.
+> The container starts in `/home/builder/workspace` (set in the Dockerfile).  
+> You can clone directly into the current directory.  
+> Use `docker cp` after the build to copy artifacts out as needed.
+</details>
+
+Once your container is running, continue following the original build manual for the next steps.

@@ -3,8 +3,21 @@ ARG ZEPHYR_SDK_VERSION=0.16.3
 FROM alpine:latest AS sdk_fetcher
 
 ARG ZEPHYR_SDK_VERSION
-ADD https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz /zephyr-sdk.tar.xz
-RUN tar xf /zephyr-sdk.tar.xz
+ARG TARGETARCH
+
+# Map Docker TARGETARCH to Zephyr SDK archive names, download, and extract
+RUN set -e; \
+    case "${TARGETARCH}" in \
+    amd64)  SDK_ARCH="x86_64" ;; \
+    arm64)  SDK_ARCH="aarch64" ;; \
+    *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac; \
+    # Use aria2c for faster and more reliable downloads (supports parallel connections, retries, and resume)
+    apk add --no-cache aria2 ca-certificates; \
+    aria2c -c --max-tries=5 -x 8 -s 8 --summary-interval=10 --console-log-level=warn \
+    -o /zephyr-sdk.tar.xz \
+    "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-${SDK_ARCH}.tar.xz"; \
+    tar xf /zephyr-sdk.tar.xz
 
 FROM ubuntu:22.04
 
@@ -40,6 +53,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     gawk \
     git \
     git-lfs \
+    gosu \
     gperf \
     liblz4-tool \
     locales \
@@ -72,16 +86,15 @@ COPY --from=sdk_fetcher /zephyr-sdk-${ZEPHYR_SDK_VERSION} /opt/zephyr-sdk-${ZEPH
 WORKDIR /opt/zephyr-sdk-${ZEPHYR_SDK_VERSION}
 RUN ./setup.sh -h
 
-# Create non-root user
-ENV USER_NAME=builder
-RUN groupadd --gid "${USER_GID}" "${USER_NAME}" \
-    && useradd --uid ${USER_ID} --gid ${USER_GID} --create-home --shell /bin/bash ${USER_NAME} \
-    && mkdir -p /home/$USER_NAME/workspace \
-    && chown $USER_NAME:$USER_NAME /home/$USER_NAME/workspace
+# Default runtime identity (can be overridden by -e or build args)
+ENV USER_NAME=builder USER_ID=1000 USER_GID=1000
 
-# Switch the user from root to $USER_NAME (builder)
-USER $USER_NAME
-WORKDIR /home/$USER_NAME/workspace
+# Use a neutral working directory; entrypoint will ensure permissions
+WORKDIR /workspace
 
-# Create dummy ~/.gitconfig
-RUN git config --global user.name "Isolated Builder"  &&  git config --global user.email "builder@example.com"
+# copy a tiny entrypoint
+COPY ./doc/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]
